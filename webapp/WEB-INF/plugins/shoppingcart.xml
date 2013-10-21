@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<plug-in>
+    <name>shoppingcart</name>
+    <class>fr.paris.lutece.plugins.shoppingcart.service.ShoppingCartPlugin</class>
+    <version>1.0.0</version>
+    <documentation></documentation>
+    <installation></installation>
+    <changes></changes>
+    <user-guide></user-guide>
+    <description>shoppingcart.plugin.description</description>
+    <provider>shoppingcart.plugin.provider</provider>
+    <provider-url>http://dev.lutece.paris.fr</provider-url>
+    <icon-url>images/admin/skin/plugins/shoppingcart/shoppingcart.png</icon-url>
+    <copyright>Copyright (c) 2013 Mairie de Paris</copyright>
+    <db-pool-required>1</db-pool-required>
+    
+    <!-- Admin features parameters -->
+    <admin-features>
+        <admin-feature>
+            <feature-id>SHOPPINGCART_VALIDATORS_MANAGEMENT</feature-id>
+            <feature-title>shoppingcart.adminFeature.ManageShoppingCart.name</feature-title>
+            <feature-description>shoppingcart.adminFeature.ManageShoppingCart.description</feature-description>
+            <feature-level>0</feature-level>
+            <feature-url>jsp/admin/plugins/shoppingcart/ManageShoppingCart.jsp</feature-url>
+            <feature-icon-url></feature-icon-url>
+      </admin-feature>
+    </admin-features>    
+  	<!-- XPages parameters -->
+    <applications>
+        <application>
+            <application-id>shoppingcart</application-id>
+            <application-class>fr.paris.lutece.plugins.shoppingcart.web.ShoppingCartApp</application-class>
+        </application>
+    </applications>
+	<!-- Portlet parameters -->
+    <portlets>
+     <portlet>
+       <portlet-class>fr.paris.lutece.plugins.shoppingcart.business.portlet.ShoppingCartPortletHome</portlet-class>
+	   <portlet-type-id>SHOPPINGCART_PORTLET</portlet-type-id>
+	   <portlet-type-name>shoppingcart.portlet.shoppingcartShoppingCartPortlet.name</portlet-type-name>
+	   <portlet-creation-url>plugins/shoppingcart/CreatePortletShoppingCart.jsp</portlet-creation-url>
+	   <portlet-update-url>plugins/shoppingcart/ModifyPortletShoppingCart.jsp</portlet-update-url>
+	   <portlet-create-action-url>plugins/shoppingcart/DoCreatePortletShoppingCart.jsp</portlet-create-action-url>
+      <portlet-modify-action-url>plugins/shoppingcart/DoModifyPortletShoppingCart.jsp</portlet-modify-action-url>
+	    <!-- optional entries -->
+        <portlet-create-script-template>/admin/portlet/script_create_portlet.html</portlet-create-script-template>
+        <portlet-modify-script-template>/admin/portlet/script_modify_portlet.html</portlet-modify-script-template>
+        <portlet-create-specific-template>/admin/plugins/shoppingcart/portlet/create_portletshoppingcart.html</portlet-create-specific-template>
+        <portlet-modify-specific-template>/admin/plugins/shoppingcart/portlet/modify_portletshoppingcart.html</portlet-modify-specific-template>
+        <portlet-create-specific-form-template></portlet-create-specific-form-template>
+        <portlet-modify-specific-form-template></portlet-modify-specific-form-template> 
+     </portlet>
+   </portlets>
+   
+   <filters>
+		<filter>
+			<filter-name>Anonymous Shopping Cart Filter</filter-name>
+			<filter-class>fr.paris.lutece.plugins.shoppingcart.service.AnonymousShoppingCartFilter</filter-class>
+			<url-pattern>/jsp/site/*</url-pattern>
+		</filter>
+	</filters>
+</plug-in>
