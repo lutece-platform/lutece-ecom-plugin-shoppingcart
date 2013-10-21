@@ -62,4 +62,11 @@ public interface IShoppingCartPersistenceService
      *            otherwise
      */
     void emptyShoppingCartOfUser( String strUserName, boolean bNotifyProviderService );
+
+    /**
+     * Get a shopping cart item from its id
+     * @param nIdShoppingCartItem The id of the shopping cart item
+     * @return The shopping cart item, or null if the item was not found
+     */
+    ShoppingCartItem findItemById( int nIdShoppingCartItem );
 }

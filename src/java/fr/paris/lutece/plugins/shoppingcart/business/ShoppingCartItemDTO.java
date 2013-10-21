@@ -33,130 +33,28 @@
  */
 package fr.paris.lutece.plugins.shoppingcart.business;
 
-import java.util.Date;
-
-
 /**
  * DTO for shopping cart items
  */
-public class ShoppingCartItemDTO
+public class ShoppingCartItemDTO extends ShoppingCartItem
 {
-    private int _nIdItem;
-    private int _nIdLot;
-    private String _strResourceType;
-    private String _strIdResource;
-    private double _dItemPrice;
-    private Date _dateCreation;
+    private static final long serialVersionUID = -151748226768049873L;
+
     private String _strDescription;
     private String _strModificationUrl;
 
     /**
-     * Returns the IdItem
-     * @return The IdItem
+     * Creates a new DTO from values of an item
+     * @param item The item to get values of
      */
-    public int getIdItem( )
+    public ShoppingCartItemDTO( ShoppingCartItem item )
     {
-        return _nIdItem;
-    }
-
-    /**
-     * Sets the IdItem
-     * @param nIdItem The IdItem
-     */
-    public void setIdItem( int nIdItem )
-    {
-        _nIdItem = nIdItem;
-    }
-
-    /**
-     * Returns the id of the lot
-     * @return The id of the lot
-     */
-    public int getIdLot( )
-    {
-        return _nIdLot;
-    }
-
-    /**
-     * Sets the id of the lot
-     * @param nIdLot The id of the lot
-     */
-    public void setIdLot( int nIdLot )
-    {
-        _nIdLot = nIdLot;
-    }
-
-    /**
-     * Returns the type of the resource added to the shopping cart
-     * @return The type of the resource added to the shopping cart
-     */
-    public String getResourceType( )
-    {
-        return _strResourceType;
-    }
-
-    /**
-     * Sets the type of the resource added to the shopping cart
-     * @param strResourceType The type of the resource added to the shopping
-     *            cart
-     */
-    public void setResourceType( String strResourceType )
-    {
-        _strResourceType = strResourceType;
-    }
-
-    /**
-     * Returns the id of the resource added to the shopping cart
-     * @return The id of the resource added to the shopping cart
-     */
-    public String getIdResource( )
-    {
-        return _strIdResource;
-    }
-
-    /**
-     * Sets the id of the resource added to the shopping cart
-     * @param strIdResource The id of the resource added to the shopping cart
-     */
-    public void setIdResource( String strIdResource )
-    {
-        _strIdResource = strIdResource;
-    }
-
-    /**
-     * Returns the price of the item
-     * @return The price of the item
-     */
-    public double getItemPrice( )
-    {
-        return _dItemPrice;
-    }
-
-    /**
-     * Sets the price of the item
-     * @param dItemPrice The price of the item
-     */
-    public void setItemPrice( double dItemPrice )
-    {
-        _dItemPrice = dItemPrice;
-    }
-
-    /**
-     * Get the creation date of this shopping item
-     * @return The creation date of this shopping item
-     */
-    public Date getDateCreation( )
-    {
-        return _dateCreation == null ? null : (Date) _dateCreation.clone( );
-    }
-
-    /**
-     * Set the creation date of this shopping item
-     * @param dateCreation The creation date of this shopping item
-     */
-    public void setDateCreation( Date dateCreation )
-    {
-        this._dateCreation = dateCreation == null ? null : (Date) dateCreation.clone( );
+        setIdItem( item.getIdItem( ) );
+        setIdLot( item.getIdLot( ) );
+        setResourceType( item.getResourceType( ) );
+        setIdResource( item.getIdResource( ) );
+        setItemPrice( item.getItemPrice( ) );
+        setDateCreation( item.getDateCreation( ) );
     }
 
     /**

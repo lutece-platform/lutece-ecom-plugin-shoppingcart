@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.mutable.MutableInt;
 
 
 /**
@@ -23,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 public class SessionPersistenceService implements IShoppingCartPersistenceService
 {
     private static final String SESSION_ATTRIBUTE_SHOPPING_CART = "shoppingcart.sessionShoppingCartItems";
+    private static final String SESSION_ATTRIBUTE_ID_SHOPPING_CART_ITEM = "shoppingcart.sessionIdShoppingCart";
 
     private static final String SERVICE_NAME = "shoppingcart.seccionPersistenceService";
 
@@ -49,7 +51,7 @@ public class SessionPersistenceService implements IShoppingCartPersistenceServic
         {
             listItems = sessionedItem.getItemList( );
         }
-        item.setIdItem( listItems.size( ) + 1 );
+        item.setIdItem( getNewShoppingCartItemId( ) );
         listItems.add( item );
     }
 
@@ -94,12 +96,7 @@ public class SessionPersistenceService implements IShoppingCartPersistenceServic
     @Override
     public List<ShoppingCartItem> getItemsOfUser( String strUserName )
     {
-        SessionedShoppingCartItem sessionedItem = getSessionedShoppingCartItem( );
-        if ( sessionedItem != null )
-        {
-            return sessionedItem.getItemList( );
-        }
-        return null;
+        return getItemsOfUser( );
     }
 
     /**
@@ -165,6 +162,23 @@ public class SessionPersistenceService implements IShoppingCartPersistenceServic
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ShoppingCartItem findItemById( int nIdShoppingCartItem )
+    {
+        List<ShoppingCartItem> listItems = getItemsOfUser( );
+        for ( ShoppingCartItem item : listItems )
+        {
+            if ( item.getIdItem( ) == nIdShoppingCartItem )
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Check if an item match values of a filter
      * @param item The item to check
      * @param filter The values that the item must have
@@ -197,14 +211,10 @@ public class SessionPersistenceService implements IShoppingCartPersistenceServic
      */
     private SessionedShoppingCartItem getSessionedShoppingCartItem( )
     {
-        HttpServletRequest request = LocalVariables.getRequest( );
-        if ( request != null )
+        HttpSession session = getSession( );
+        if ( session != null )
         {
-            HttpSession session = request.getSession( false );
-            if ( session != null )
-            {
-                return (SessionedShoppingCartItem) session.getAttribute( SESSION_ATTRIBUTE_SHOPPING_CART );
-            }
+            return (SessionedShoppingCartItem) session.getAttribute( SESSION_ATTRIBUTE_SHOPPING_CART );
         }
         AppLogService.error(
                 "No request or session attached to this context : could not return the sessioned shopping card item",
@@ -218,21 +228,62 @@ public class SessionPersistenceService implements IShoppingCartPersistenceServic
      */
     private void saveSessionedShoppingCartItem( SessionedShoppingCartItem sessionedItem )
     {
-        HttpServletRequest request = LocalVariables.getRequest( );
-        if ( request != null )
+        HttpSession session = getSession( );
+        if ( session != null )
         {
-            HttpSession session = request.getSession( true );
-            if ( session != null )
-            {
-                session.setAttribute( SESSION_ATTRIBUTE_SHOPPING_CART, sessionedItem );
-            }
-        }
-        else
-        {
-            AppLogService.error(
-                    "No request attached to this context : could not save the sessioned shopping card item",
-                    new AppException( ) );
+            session.setAttribute( SESSION_ATTRIBUTE_SHOPPING_CART, sessionedItem );
         }
     }
 
+    private HttpSession getSession( )
+    {
+        HttpServletRequest request = LocalVariables.getRequest( );
+        if ( request != null )
+        {
+            return request.getSession( true );
+        }
+        AppLogService.error( "No request attached to this context : could not save the sessioned shopping card item",
+                new AppException( ) );
+        return null;
+    }
+
+    /**
+     * Get the items of the current user that are stored in session
+     * @return The items of the current user
+     */
+    private List<ShoppingCartItem> getItemsOfUser( )
+    {
+        SessionedShoppingCartItem sessionedItem = getSessionedShoppingCartItem( );
+        if ( sessionedItem == null )
+        {
+            List<ShoppingCartItem> listItems = new ArrayList<ShoppingCartItem>( );
+            sessionedItem = new SessionedShoppingCartItem( listItems, true );
+            saveSessionedShoppingCartItem( sessionedItem );
+        }
+        return sessionedItem.getItemList( );
+    }
+
+    /**
+     * Get a new id for shopping cart items of a user
+     * @return The new id, or 0 if this is not a request session
+     */
+    private int getNewShoppingCartItemId( )
+    {
+        HttpSession session = getSession( );
+        if ( session != null )
+        {
+            MutableInt nCurrentId = (MutableInt) session.getAttribute( SESSION_ATTRIBUTE_ID_SHOPPING_CART_ITEM );
+            if ( nCurrentId == null )
+            {
+                nCurrentId = new MutableInt( 1 );
+                session.setAttribute( SESSION_ATTRIBUTE_ID_SHOPPING_CART_ITEM, nCurrentId );
+            }
+            else
+            {
+                nCurrentId.increment( );
+            }
+            return nCurrentId.intValue( );
+        }
+        return 0;
+    }
 }

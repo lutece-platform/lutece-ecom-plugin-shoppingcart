@@ -10,5 +10,6 @@ CREATE TABLE shoppingcart_shopping_item (
 	resource_type varchar(255) NOT NULL default '',
 	id_resource varchar(255) NOT NULL default '',
 	item_price double NOT NULL default '0',
+	date_creation date NOT NULL,
 	PRIMARY KEY (id_item)
 );

@@ -6,10 +6,37 @@
 				#i18n{shoppingcart.myshoppingCart.noItem}
 			<#else>
 				<table class="table">
+					<th>
+						#i18n{shoppingcart.myshoppintCart.labelColumnDescription}
+					</th>
+					<#if has_price?? && has_price>
+					<th>
+							#i18n{shoppingcart.myshoppintCart.labelColumnPrice}
+					</th>
+					</#if>
+					<th>
+						#i18n{shoppingcart.myshoppintCart.labelColumnActions}
+					</th>
+					
 					<#list list_items as item>
 						<tr>
 							<td>
-								${item}
+								${item.description}
+							</td>
+							<#if has_price?? && has_price>
+								<td>
+									${item.itemPrice}
+								</td>
+							</#if>
+							<td>
+								<#if item.modificationUrl??>
+									<a class="btn btn-primary btn-small" href="${item.modificationUrl}" title="#i18n{portal.util.labelModify}">
+										<i class="icon-edit icon-white">&nbsp;</i>&nbsp;#i18n{portal.util.labelModify}
+									</a>
+								</#if>
+								<a class="btn btn-danger btn-small" href="jsp/site/Portal.jsp?page=shoppingcart&action=confirmRemoveItem&idItem=${item.idItem}" title="#i18n{portal.util.labelDelete}">
+									<i class="icon-trash icon-white">&nbsp;</i>&nbsp;#i18n{portal.util.labelDelete}
+								</a>
 							</td>
 						</tr>
 					</#list>

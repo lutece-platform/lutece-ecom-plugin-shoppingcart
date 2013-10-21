@@ -46,8 +46,7 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 public final class ShoppingCartPortletHome extends PortletHome
 {
     // Static variable pointed at the DAO instance
-    private static IShoppingCartPortletDAO _dao = (IShoppingCartPortletDAO) SpringContextService
-            .getBean( "shoppingcart.ShoppingCartPortletDAO" );
+    private static IShoppingCartPortletDAO _dao = SpringContextService.getBean( "shoppingcart.ShoppingCartPortletDAO" );
 
     /* This class implements the Singleton design pattern. */
     private static volatile ShoppingCartPortletHome _singleton;

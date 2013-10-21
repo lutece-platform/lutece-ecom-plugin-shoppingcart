@@ -35,19 +35,29 @@
 package fr.paris.lutece.plugins.shoppingcart.web;
 
 import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItem;
+import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItemDTO;
 import fr.paris.lutece.plugins.shoppingcart.service.ShoppingCartService;
+import fr.paris.lutece.plugins.shoppingcart.service.provider.ShoppingCartItemProviderManagementService;
+import fr.paris.lutece.portal.service.message.SiteMessage;
+import fr.paris.lutece.portal.service.message.SiteMessageException;
+import fr.paris.lutece.portal.service.message.SiteMessageService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
 import fr.paris.lutece.portal.web.xpages.XPage;
+import fr.paris.lutece.util.url.UrlItem;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -60,7 +70,17 @@ public class ShoppingCartApp extends MVCApplication
     private static final String TEMPLATE_MY_SHOPPING_CART = "/skin/plugins/shoppingcart/my_shoppingcart.html";
     private static final String VIEW_MY_SHOPPING_CART = "myShoppingCart";
 
+    private static final String ACTION_CONFIRM_REMOVE_ITEM = "confirmRemoveItem";
+    private static final String ACTION_REMOVE_ITEM = "removeItem";
+
+    private static final String MESSAGE_CONFIRM_REMOVE_ITEM = "shoppingcart.myshoppingCart.confirmRemoveItem";
+
+    private static final String PARAMETER_ID_ITEM = "idItem";
+
     private static final String MARK_LIST_ITEMS = "list_items";
+    private static final String MARK_HAS_PRICE = "has_price";
+
+    private static final String PATH_PORTAL = "jsp/site/";
 
     /**
      * Returns the content of the shopping cart page.
@@ -70,10 +90,79 @@ public class ShoppingCartApp extends MVCApplication
     @View( value = VIEW_MY_SHOPPING_CART, defaultView = true )
     public XPage viewHome( HttpServletRequest request )
     {
+        //        ShoppingCartItem newItem = new ShoppingCartItem( );
+        //        newItem.setIdLot( 1 );
+        //        newItem.setIdResource( "3" );
+        //        newItem.setIdProvider( "dummyProviderService" );
+        //        newItem.setResourceType( "resource type" );
+        //        newItem.setItemPrice( 0d );
+        //        ShoppingCartService.getInstance( ).addItemToShoppingCart( newItem );
+
         LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
-        List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getUserShoppingCart( user );
+        List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getShoppingCartOfUser( user );
+
+        List<ShoppingCartItemDTO> listDto = new ArrayList<ShoppingCartItemDTO>( listItems.size( ) );
+        boolean bHasPrice = false;
+        for ( ShoppingCartItem item : listItems )
+        {
+            ShoppingCartItemDTO itemDTO = new ShoppingCartItemDTO( item );
+            itemDTO.setDescription( ShoppingCartItemProviderManagementService.getItemDescription(
+                    item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
+            itemDTO.setModificationUrl( ShoppingCartItemProviderManagementService.getItemModificationUrl(
+                    item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
+            listDto.add( itemDTO );
+            if ( itemDTO.getItemPrice( ) > 0d )
+            {
+                bHasPrice = true;
+            }
+        }
+
         Map<String, Object> model = new HashMap<String, Object>( );
-        model.put( MARK_LIST_ITEMS, listItems );
+        model.put( MARK_LIST_ITEMS, listDto );
+        model.put( MARK_HAS_PRICE, bHasPrice );
         return getXPage( TEMPLATE_MY_SHOPPING_CART, request.getLocale( ), model );
+    }
+
+    /**
+     * Get the confirmation message before removing an item from the shopping
+     * cart of the user
+     * @param request The request
+     * @return An XPage
+     * @throws SiteMessageException The message to display
+     */
+    @Action( ACTION_CONFIRM_REMOVE_ITEM )
+    public XPage getConfirmRemoveItem( HttpServletRequest request ) throws SiteMessageException
+    {
+        String strIdItem = request.getParameter( PARAMETER_ID_ITEM );
+        if ( StringUtils.isEmpty( strIdItem ) || !StringUtils.isNumeric( strIdItem ) )
+        {
+            return redirectView( request, VIEW_MY_SHOPPING_CART );
+        }
+
+        UrlItem url = new UrlItem( PATH_PORTAL + getActionUrl( ACTION_REMOVE_ITEM ) );
+        url.addParameter( PARAMETER_ID_ITEM, strIdItem );
+        SiteMessageService.setMessage( request, MESSAGE_CONFIRM_REMOVE_ITEM, SiteMessage.TYPE_CONFIRMATION,
+                url.getUrl( ) );
+
+        return new XPage( );
+    }
+
+    /**
+     * Do remove a shopping cart item
+     * @param request The request
+     * @return An XPage
+     */
+    @Action( ACTION_REMOVE_ITEM )
+    public XPage removeItem( HttpServletRequest request )
+    {
+        String strIdItem = request.getParameter( PARAMETER_ID_ITEM );
+        if ( StringUtils.isNotEmpty( strIdItem ) && StringUtils.isNumeric( strIdItem ) )
+        {
+            int nIdItem = Integer.parseInt( strIdItem );
+            LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
+            ShoppingCartService.getInstance( ).removeShoppingCartItem( user == null ? null : user.getName( ), nIdItem,
+                    true );
+        }
+        return redirectView( request, VIEW_MY_SHOPPING_CART );
     }
 }

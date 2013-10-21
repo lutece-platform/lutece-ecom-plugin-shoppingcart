@@ -69,9 +69,9 @@ public final class ShoppingCartService
      * @param user The user
      * @return The list of shopping cart items of the user
      */
-    public List<ShoppingCartItem> getUserShoppingCart( LuteceUser user )
+    public List<ShoppingCartItem> getShoppingCartOfUser( LuteceUser user )
     {
-        return getUserShoppingCart( user == null ? null : user.getName( ) );
+        return getShoppingCartOfUser( user == null ? null : user.getName( ) );
     }
 
     /**
@@ -79,7 +79,7 @@ public final class ShoppingCartService
      * @param strUserName The name of the lutece user
      * @return The list of shopping cart items of the user
      */
-    public List<ShoppingCartItem> getUserShoppingCart( String strUserName )
+    public List<ShoppingCartItem> getShoppingCartOfUser( String strUserName )
     {
         IShoppingCartPersistenceService persistenceService = getPersistenceService( isUserAnonymous( strUserName ) );
         return persistenceService.getItemsOfUser( strUserName );
@@ -100,6 +100,19 @@ public final class ShoppingCartService
     }
 
     /**
+     * Get a shopping cart item from its id
+     * @param nIdShoppingCartItem The id of the shopping cart item
+     * @param strUserName The name of the user associated with the shopping cart
+     *            item
+     * @return The item, or null if the item was not found
+     */
+    public ShoppingCartItem getShoppingCartItem( int nIdShoppingCartItem, String strUserName )
+    {
+        IShoppingCartPersistenceService persistenceService = getPersistenceService( isUserAnonymous( strUserName ) );
+        return persistenceService.findItemById( nIdShoppingCartItem );
+    }
+
+    /**
      * Get the list of shopping cart items that match a given filter. This
      * method will only consider items saved in the database. Items saved in
      * session will be ignored.
@@ -109,6 +122,19 @@ public final class ShoppingCartService
     public List<ShoppingCartItem> getShoppingCartItemsByFilter( ShoppingCartItemFilter filter )
     {
         return getPersistenceService( false ).findItemsByFilter( filter );
+    }
+
+    /**
+     * Remove a shopping cart item and notify
+     * @param strUserName The name of the user the item belongs to
+     * @param nIdItem The id of the item to remove
+     * @param bNotifyProviderService True to notify the provider service that
+     *            the item was removed
+     */
+    public void removeShoppingCartItem( String strUserName, int nIdItem, boolean bNotifyProviderService )
+    {
+        IShoppingCartPersistenceService persistenceService = getPersistenceService( isUserAnonymous( strUserName ) );
+        persistenceService.removeItemFromUserShoppingCart( strUserName, nIdItem, bNotifyProviderService );
     }
 
     /**
@@ -144,7 +170,7 @@ public final class ShoppingCartService
      */
     private boolean isUserAnonymous( String strUserName )
     {
-        return StringUtils.isEmpty( strUserName ) && StringUtils.equals( strUserName, LuteceUser.ANONYMOUS_USERNAME );
+        return StringUtils.isEmpty( strUserName ) || StringUtils.equals( strUserName, LuteceUser.ANONYMOUS_USERNAME );
     }
 
     /**

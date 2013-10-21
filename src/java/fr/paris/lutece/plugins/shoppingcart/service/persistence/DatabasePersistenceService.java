@@ -100,4 +100,13 @@ public class DatabasePersistenceService implements IShoppingCartPersistenceServi
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ShoppingCartItem findItemById( int nIdShoppingCartItem )
+    {
+        return ShoppingCartItemHome.findByPrimaryKey( nIdShoppingCartItem );
+    }
+
 }

@@ -5,6 +5,6 @@
 
     <bean id="shoppingcart.ShoppingCartPortletDAO"  class="fr.paris.lutece.plugins.shoppingcart.business.portlet.ShoppingCartPortletDAO" />
     
-    <bean id="shoppingcart.sessionPersistenceService" class="fr.paris.lutece.plugins.shoppingcart.service.provider.SessionPersistenceService" />
-    <bean id="shoppingcart.databasePersistenceService" class="fr.paris.lutece.plugins.shoppingcart.service.provider.DatabasePersistenceService" />
+    <bean id="shoppingcart.sessionPersistenceService" class="fr.paris.lutece.plugins.shoppingcart.service.persistence.SessionPersistenceService" />
+    <bean id="shoppingcart.databasePersistenceService" class="fr.paris.lutece.plugins.shoppingcart.service.persistence.DatabasePersistenceService" />
 </beans>
