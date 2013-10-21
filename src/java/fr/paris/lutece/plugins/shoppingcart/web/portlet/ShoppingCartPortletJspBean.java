@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.shoppingcart.web.portlet;
 
-
 import fr.paris.lutece.plugins.shoppingcart.business.portlet.ShoppingCartPortlet;
 import fr.paris.lutece.plugins.shoppingcart.business.portlet.ShoppingCartPortletHome;
 import fr.paris.lutece.portal.business.portlet.PortletHome;
@@ -49,9 +48,11 @@ import javax.servlet.http.HttpServletRequest;
 public class ShoppingCartPortletJspBean extends PortletJspBean
 {
 
+    private static final long serialVersionUID = -6749933994381928758L;
+
     /**
      * Returns the ShoppingCartPortlet form of creation
-     *
+     * 
      * @param request The Http rquest
      * @return the html code of the ShoppingCartPortlet portlet form
      */
@@ -62,7 +63,7 @@ public class ShoppingCartPortletJspBean extends PortletJspBean
         String strPortletTypeId = request.getParameter( PARAMETER_PORTLET_TYPE_ID );
         HtmlTemplate template = getCreateTemplate( strPageId, strPortletTypeId );
 
-        return template.getHtml(  );
+        return template.getHtml( );
     }
 
     /**
@@ -78,19 +79,20 @@ public class ShoppingCartPortletJspBean extends PortletJspBean
         ShoppingCartPortlet portlet = (ShoppingCartPortlet) PortletHome.findByPrimaryKey( nPortletId );
         HtmlTemplate template = getModifyTemplate( portlet );
 
-        return template.getHtml(  );
+        return template.getHtml( );
     }
 
     /**
      * Treats the creation form of a new ShoppingCartPortlet portlet
-     *
+     * 
      * @param request The Http request
-     * @return The jsp URL which displays the view of the created ShoppingCartPortlet portlet
+     * @return The jsp URL which displays the view of the created
+     *         ShoppingCartPortlet portlet
      */
     @Override
     public String doCreate( HttpServletRequest request )
     {
-        ShoppingCartPortlet portlet = new ShoppingCartPortlet(  );
+        ShoppingCartPortlet portlet = new ShoppingCartPortlet( );
 
         // recovers portlet specific attributes
         String strPageId = request.getParameter( PARAMETER_PAGE_ID );
@@ -107,15 +109,16 @@ public class ShoppingCartPortletJspBean extends PortletJspBean
         portlet.setPageId( nPageId );
 
         // Creates the portlet
-        ShoppingCartPortletHome.getInstance(  ).create( portlet );
+        ShoppingCartPortletHome.getInstance( ).create( portlet );
 
         //Displays the page with the new Portlet
         return getPageUrl( nPageId );
     }
 
     /**
-     * Treats the update form of the ShoppingCartPortlet portlet whose identifier is in the http request
-     *
+     * Treats the update form of the ShoppingCartPortlet portlet whose
+     * identifier is in the http request
+     * 
      * @param request The Http request
      * @return The jsp URL which displays the view of the updated portlet
      */
@@ -136,10 +139,10 @@ public class ShoppingCartPortletJspBean extends PortletJspBean
         }
 
         // updates the portlet
-        portlet.update(  );
+        portlet.update( );
 
         // displays the page with the updated portlet
-        return getPageUrl( portlet.getPageId(  ) );
+        return getPageUrl( portlet.getPageId( ) );
     }
 
 }

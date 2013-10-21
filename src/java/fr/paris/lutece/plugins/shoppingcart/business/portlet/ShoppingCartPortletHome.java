@@ -40,35 +40,33 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 
 /**
- * This class provides instances management methods for ShoppingCartPortlet objects
+ * This class provides instances management methods for ShoppingCartPortlet
+ * objects
  */
 public class ShoppingCartPortletHome extends PortletHome
 {
     // Static variable pointed at the DAO instance
-    private static IShoppingCartPortletDAO _dao = (IShoppingCartPortletDAO) SpringContextService.getBean( "shoppingcart.ShoppingCartPortletDAO" );
+    private static IShoppingCartPortletDAO _dao = (IShoppingCartPortletDAO) SpringContextService
+            .getBean( "shoppingcart.ShoppingCartPortletDAO" );
 
     /* This class implements the Singleton design pattern. */
-    private static ShoppingCartPortletHome _singleton;
+    private static volatile ShoppingCartPortletHome _singleton;
 
     /**
      * Constructor
      */
-    public ShoppingCartPortletHome(  )
+    private ShoppingCartPortletHome( )
     {
-        if ( _singleton == null )
-        {
-            _singleton = this;
-        }
     }
 
     /**
      * Returns the identifier of the portlet type
-     *
+     * 
      * @return the portlet type identifier
      */
-    public String getPortletTypeId(  )
+    public String getPortletTypeId( )
     {
-        String strCurrentClassName = this.getClass(  ).getName(  );
+        String strCurrentClassName = this.getClass( ).getName( );
         String strPortletTypeId = PortletTypeHome.getPortletTypeId( strCurrentClassName );
 
         return strPortletTypeId;
@@ -76,14 +74,14 @@ public class ShoppingCartPortletHome extends PortletHome
 
     /**
      * Returns the instance of ShoppingCartPortlet Portlet
-     *
+     * 
      * @return the ShoppingCartPortlet Portlet instance
      */
-    public static PortletHome getInstance(  )
+    public static PortletHome getInstance( )
     {
         if ( _singleton == null )
         {
-            _singleton = new ShoppingCartPortletHome(  );
+            _singleton = new ShoppingCartPortletHome( );
         }
 
         return _singleton;
@@ -91,13 +89,12 @@ public class ShoppingCartPortletHome extends PortletHome
 
     /**
      * Returns the instance of the portlet DAO singleton
-     *
+     * 
      * @return the instance of the DAO singleton
      */
-    public IPortletInterfaceDAO getDAO(  )
+    public IPortletInterfaceDAO getDAO( )
     {
         return _dao;
     }
 
 }
-

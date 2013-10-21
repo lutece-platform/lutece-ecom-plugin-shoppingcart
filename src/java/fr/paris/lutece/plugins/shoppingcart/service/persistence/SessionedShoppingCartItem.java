@@ -4,6 +4,7 @@ import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItem;
 import fr.paris.lutece.plugins.shoppingcart.service.provider.ShoppingCartItemProviderManagementService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +12,13 @@ import java.util.List;
 /**
  * Class that manage shopping card items saved in an http session
  */
-public class SessionedShoppingCartItem
+public class SessionedShoppingCartItem implements Serializable
 {
+    /**
+     * Serial version UID
+     */
+    private static final long serialVersionUID = -4310290073260410209L;
+
     private boolean _bNotifyProvider;
     private List<ShoppingCartItem> _listItems;
 
@@ -70,5 +76,6 @@ public class SessionedShoppingCartItem
             // Since we are in a finalize method, we try/catch every exception to avoid error leak
             AppLogService.error( e.getMessage( ), e );
         }
+        super.finalize( );
     }
 }

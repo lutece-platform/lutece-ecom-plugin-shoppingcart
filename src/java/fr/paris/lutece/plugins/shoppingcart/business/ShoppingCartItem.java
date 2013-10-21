@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.shoppingcart.business;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.validation.constraints.Size;
@@ -43,8 +44,13 @@ import org.hibernate.validator.constraints.NotEmpty;
 /**
  * Business class of the shopping cart items
  */
-public class ShoppingCartItem
+public class ShoppingCartItem implements Serializable
 {
+    /**
+     * Serial version UID
+     */
+    private static final long serialVersionUID = 8367766101486301893L;
+
     private int _nIdItem;
     @NotEmpty( message = "#i18n{portal.validation.message.notEmpty}" )
     @Size( max = 255, message = "#i18n{portal.validation.message.sizeMax}" )
@@ -193,7 +199,7 @@ public class ShoppingCartItem
      */
     public Date getDateCreation( )
     {
-        return _dateCreation;
+        return (Date) _dateCreation.clone( );
     }
 
     /**
@@ -202,6 +208,6 @@ public class ShoppingCartItem
      */
     public void setDateCreation( Date dateCreation )
     {
-        this._dateCreation = dateCreation;
+        this._dateCreation = (Date) dateCreation.clone( );
     }
 }

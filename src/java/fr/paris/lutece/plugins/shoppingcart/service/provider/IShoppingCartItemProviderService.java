@@ -22,7 +22,7 @@ public interface IShoppingCartItemProviderService
     /**
      * Get the description of a resource. The description can be HTML code.
      * @param strResourceType The type of
-     * @param strResourceId
+     * @param strResourceId The id of the resource to get the description of
      * @return The description of the resource
      */
     String getItemDescription( String strResourceType, String strResourceId );

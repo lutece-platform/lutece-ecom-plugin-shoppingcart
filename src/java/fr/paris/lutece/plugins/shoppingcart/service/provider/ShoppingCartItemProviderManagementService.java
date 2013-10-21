@@ -9,8 +9,16 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Management class for shopping cart item providers
  */
-public class ShoppingCartItemProviderManagementService
+public final class ShoppingCartItemProviderManagementService
 {
+    /**
+     * Default constructor
+     */
+    private ShoppingCartItemProviderManagementService( )
+    {
+        // Do nothing
+    }
+
     /**
      * Notify the provider of the item that the item will be removed from the
      * shopping cart of the user
