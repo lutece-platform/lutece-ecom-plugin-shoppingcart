@@ -147,7 +147,7 @@ public class ShoppingCartItemDTO
      */
     public Date getDateCreation( )
     {
-        return (Date) _dateCreation.clone( );
+        return _dateCreation == null ? null : (Date) _dateCreation.clone( );
     }
 
     /**
@@ -156,7 +156,7 @@ public class ShoppingCartItemDTO
      */
     public void setDateCreation( Date dateCreation )
     {
-        this._dateCreation = (Date) dateCreation.clone( );
+        this._dateCreation = dateCreation == null ? null : (Date) dateCreation.clone( );
     }
 
     /**

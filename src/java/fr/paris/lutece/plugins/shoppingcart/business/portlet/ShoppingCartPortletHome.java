@@ -43,7 +43,7 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
  * This class provides instances management methods for ShoppingCartPortlet
  * objects
  */
-public class ShoppingCartPortletHome extends PortletHome
+public final class ShoppingCartPortletHome extends PortletHome
 {
     // Static variable pointed at the DAO instance
     private static IShoppingCartPortletDAO _dao = (IShoppingCartPortletDAO) SpringContextService

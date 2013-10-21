@@ -165,7 +165,7 @@ public class ShoppingCartItemFilter
      */
     public Date getDateCreationMin( )
     {
-        return (Date) _dateCreationMin.clone( );
+        return _dateCreationMin == null ? null : (Date) _dateCreationMin.clone( );
     }
 
     /**
@@ -174,7 +174,7 @@ public class ShoppingCartItemFilter
      */
     public void setDateCreationMin( Date dateCreationMin )
     {
-        this._dateCreationMin = (Date) _dateCreationMin.clone( );
+        this._dateCreationMin = dateCreationMin == null ? null : (Date) _dateCreationMin.clone( );
     }
 
     /**
@@ -183,7 +183,7 @@ public class ShoppingCartItemFilter
      */
     public Date getDateCreationMax( )
     {
-        return (Date) _dateCreationMax.clone( );
+        return _dateCreationMax == null ? null : (Date) _dateCreationMax.clone( );
     }
 
     /**
@@ -192,6 +192,6 @@ public class ShoppingCartItemFilter
      */
     public void setDateCreationMax( Date dateCreationMax )
     {
-        this._dateCreationMax = (Date) dateCreationMax.clone( );
+        this._dateCreationMax = dateCreationMax == null ? null : (Date) dateCreationMax.clone( );
     }
 }
