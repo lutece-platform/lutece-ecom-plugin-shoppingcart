@@ -155,6 +155,7 @@ public final class ShoppingCartService
                 // we add items of the anonymous service to the logged in service
                 for ( ShoppingCartItem item : listItems )
                 {
+                    item.setIdUser( strUserName );
                     loggedInUserPersistenceService.saveItem( item );
                 }
                 // Now that items are transfered, we empty the anonymous shopping cart

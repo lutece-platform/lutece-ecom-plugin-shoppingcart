@@ -36,10 +36,6 @@ package fr.paris.lutece.plugins.shoppingcart.business;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.NotEmpty;
-
 
 /**
  * Business class of the shopping cart items
@@ -52,16 +48,10 @@ public class ShoppingCartItem implements Serializable
     private static final long serialVersionUID = 8367766101486301893L;
 
     private int _nIdItem;
-    @NotEmpty( message = "#i18n{portal.validation.message.notEmpty}" )
-    @Size( max = 255, message = "#i18n{portal.validation.message.sizeMax}" )
     private String _strIdProvider;
     private int _nIdLot;
     private String _strIdUser;
-    @NotEmpty( message = "#i18n{portal.validation.message.notEmpty}" )
-    @Size( max = 255, message = "#i18n{portal.validation.message.sizeMax}" )
     private String _strResourceType;
-    @NotEmpty( message = "#i18n{portal.validation.message.notEmpty}" )
-    @Size( max = 255, message = "#i18n{portal.validation.message.sizeMax}" )
     private String _strIdResource;
     private double _dItemPrice;
     private Date _dateCreation;

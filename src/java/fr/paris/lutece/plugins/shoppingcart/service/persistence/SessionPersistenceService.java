@@ -23,6 +23,12 @@ import org.apache.commons.lang.mutable.MutableInt;
  */
 public class SessionPersistenceService implements IShoppingCartPersistenceService
 {
+    /**
+     * Session key of the Boolean attribute that indicates whether the current
+     * user has items saved in session
+     */
+    public static final String SESSION_ATTRIBUTE_HAS_SESSION_ITEMS = "shoppingcart.hasSessionItems";
+
     private static final String SESSION_ATTRIBUTE_SHOPPING_CART = "shoppingcart.sessionShoppingCartItems";
     private static final String SESSION_ATTRIBUTE_ID_SHOPPING_CART_ITEM = "shoppingcart.sessionIdShoppingCart";
 
@@ -53,6 +59,11 @@ public class SessionPersistenceService implements IShoppingCartPersistenceServic
         }
         item.setIdItem( getNewShoppingCartItemId( ) );
         listItems.add( item );
+        HttpSession session = getSession( );
+        if ( session != null )
+        {
+            session.setAttribute( SESSION_ATTRIBUTE_HAS_SESSION_ITEMS, true );
+        }
     }
 
     /**
@@ -232,9 +243,16 @@ public class SessionPersistenceService implements IShoppingCartPersistenceServic
         if ( session != null )
         {
             session.setAttribute( SESSION_ATTRIBUTE_SHOPPING_CART, sessionedItem );
+            session.setAttribute( SESSION_ATTRIBUTE_HAS_SESSION_ITEMS, sessionedItem != null
+                    && sessionedItem.getItemList( ).size( ) > 0 );
         }
     }
 
+    /**
+     * Get the session of the current context.
+     * @return The session of the current context, or null if it is not a
+     *         request context
+     */
     private HttpSession getSession( )
     {
         HttpServletRequest request = LocalVariables.getRequest( );
@@ -256,8 +274,7 @@ public class SessionPersistenceService implements IShoppingCartPersistenceServic
         SessionedShoppingCartItem sessionedItem = getSessionedShoppingCartItem( );
         if ( sessionedItem == null )
         {
-            List<ShoppingCartItem> listItems = new ArrayList<ShoppingCartItem>( );
-            sessionedItem = new SessionedShoppingCartItem( listItems, true );
+            sessionedItem = new SessionedShoppingCartItem( null, true );
             saveSessionedShoppingCartItem( sessionedItem );
         }
         return sessionedItem.getItemList( );

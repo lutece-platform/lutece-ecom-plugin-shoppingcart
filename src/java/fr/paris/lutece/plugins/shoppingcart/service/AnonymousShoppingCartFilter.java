@@ -1,7 +1,9 @@
 package fr.paris.lutece.plugins.shoppingcart.service;
 
+import fr.paris.lutece.plugins.shoppingcart.service.persistence.SessionPersistenceService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.portal.web.LocalVariables;
 
 import java.io.IOException;
 
@@ -12,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 
@@ -46,7 +49,13 @@ public class AnonymousShoppingCartFilter implements Filter
                 LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( httpRequest );
                 if ( user != null )
                 {
-                    ShoppingCartService.getInstance( ).checkAnonymousShoppingCart( user.getName( ) );
+                    Boolean bHasItemsInSession = (Boolean) session
+                            .getAttribute( SessionPersistenceService.SESSION_ATTRIBUTE_HAS_SESSION_ITEMS );
+                    if ( bHasItemsInSession != null && bHasItemsInSession )
+                    {
+                        LocalVariables.setLocal( null, httpRequest, (HttpServletResponse) response );
+                        ShoppingCartService.getInstance( ).checkAnonymousShoppingCart( user.getName( ) );
+                    }
                 }
             }
         }

@@ -7,4 +7,6 @@
     
     <bean id="shoppingcart.sessionPersistenceService" class="fr.paris.lutece.plugins.shoppingcart.service.persistence.SessionPersistenceService" />
     <bean id="shoppingcart.databasePersistenceService" class="fr.paris.lutece.plugins.shoppingcart.service.persistence.DatabasePersistenceService" />
+    
+    <bean id="shoppingcart.dummyProviderService" class="fr.paris.lutece.plugins.shoppingcart.service.provider.DummyProviderService" />
 </beans>

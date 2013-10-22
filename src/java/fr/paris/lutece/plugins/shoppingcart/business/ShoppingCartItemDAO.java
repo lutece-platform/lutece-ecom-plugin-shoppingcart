@@ -319,6 +319,7 @@ public final class ShoppingCartItemDAO implements IShoppingCartItemDAO
             shoppingItem.setIdResource( daoUtil.getString( 6 ) );
             shoppingItem.setItemPrice( daoUtil.getDouble( 7 ) );
             shoppingItem.setDateCreation( daoUtil.getDate( 8 ) );
+            listItems.add( shoppingItem );
         }
 
         daoUtil.free( );
