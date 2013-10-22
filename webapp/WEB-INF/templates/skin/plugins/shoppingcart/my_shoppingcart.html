@@ -6,18 +6,19 @@
 				#i18n{shoppingcart.myshoppingCart.noItem}
 			<#else>
 				<table class="table">
-					<th>
-						#i18n{shoppingcart.myshoppintCart.labelColumnDescription}
-					</th>
-					<#if has_price?? && has_price>
-					<th>
-							#i18n{shoppingcart.myshoppintCart.labelColumnPrice}
-					</th>
-					</#if>
-					<th>
-						#i18n{shoppingcart.myshoppintCart.labelColumnActions}
-					</th>
-					
+					<tr>
+						<th>
+							#i18n{shoppingcart.myshoppintCart.labelColumnDescription}
+						</th>
+						<#if has_price?? && has_price>
+							<th>
+									#i18n{shoppingcart.myshoppintCart.labelColumnPrice}
+							</th>
+						</#if>
+						<th>
+							#i18n{shoppingcart.myshoppintCart.labelColumnActions}
+						</th>
+					</tr>
 					<#list list_items as item>
 						<tr>
 							<td>

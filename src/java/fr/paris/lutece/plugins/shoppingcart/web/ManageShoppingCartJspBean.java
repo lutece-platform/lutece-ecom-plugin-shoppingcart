@@ -33,13 +33,22 @@
  */
 package fr.paris.lutece.plugins.shoppingcart.web;
 
+import fr.paris.lutece.plugins.shoppingcart.service.daemon.ShoppingCartCleanerDaemon;
+import fr.paris.lutece.plugins.shoppingcart.service.validator.IShoppingCartValidator;
+import fr.paris.lutece.plugins.shoppingcart.service.validator.ShoppingCartValidatorManagementService;
+import fr.paris.lutece.portal.service.datastore.DatastoreService;
 import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -57,7 +66,18 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
 
     private static final long serialVersionUID = 1958567840099955905L;
 
+    private static final String VIEW_MANAGE_SHOPPING_CART = "manageShoppingCart";
+    private static final String ACTION_DO_MODIFY_VALIDATOR_ORDER = "doModifyValidatorOrder";
+    private static final String ACTION_DO_MODIFY_VALIDATOR_ENABLING = "doModifyValidatorEnabling";
+
     private static final String PROPERTY_PAGE_TITLE_MANAGE_SHOPPINGCART = "shoppingcart.manage_shoppingcart.pageTitle";
+
+    private static final String MARK_NB_DAYS_BEFORE_CLEANING = "nbDaysBeforeCleaning";
+    private static final String MARK_VALIDATORS = "validators";
+
+    private static final String PARAMETER_VALIDATOR_ID = "validatorId";
+    private static final String PARAMETER_NEW_ORDER = "newOrder";
+    private static final String PARAMETER_ENABLE = "enable";
 
     // Templates
     private static final String TEMPLATE_MANAGE_SHOPPINGCART = "admin/plugins/shoppingcart/manage_shoppingcart.html";
@@ -67,11 +87,58 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
      * @param request The request
      * @return The HTML content to display
      */
+    @View( value = VIEW_MANAGE_SHOPPING_CART, defaultView = true )
     public String getManageShoppingCart( HttpServletRequest request )
     {
 
+        String strNbDaysBeforeCleaning = DatastoreService.getInstanceDataValue(
+                ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_DAYS_BEFORE_CLEANING, "" );
+        List<IShoppingCartValidator> listValidators = ShoppingCartValidatorManagementService.getInstance( )
+                .getValidatorlist( );
+
         Map<String, Object> model = new HashMap<String, Object>( );
 
+        model.put( MARK_NB_DAYS_BEFORE_CLEANING, strNbDaysBeforeCleaning );
+        model.put( MARK_VALIDATORS, listValidators );
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_SHOPPINGCART, TEMPLATE_MANAGE_SHOPPINGCART, model );
+    }
+
+    /**
+     * Do modify the order of a validator
+     * @param request The request
+     * @return The next URL to redirect to
+     */
+    @Action( value = ACTION_DO_MODIFY_VALIDATOR_ORDER )
+    public String doModifyValidatorOrder( HttpServletRequest request )
+    {
+        String strValidatorId = request.getParameter( PARAMETER_VALIDATOR_ID );
+        String strOrder = request.getParameter( PARAMETER_NEW_ORDER );
+
+        if ( StringUtils.isNotEmpty( strValidatorId ) && StringUtils.isNotEmpty( strOrder )
+                && StringUtils.isNumeric( strOrder ) )
+        {
+            int nNewOrder = Integer.parseInt( strOrder );
+            ShoppingCartValidatorManagementService.getInstance( ).modifyValidatorOrder( strValidatorId, nNewOrder );
+        }
+
+        return redirectView( request, VIEW_MANAGE_SHOPPING_CART );
+    }
+
+    /**
+     * Do modify the order of a validator
+     * @param request The request
+     * @return The next URL to redirect to
+     */
+    @Action( value = ACTION_DO_MODIFY_VALIDATOR_ENABLING )
+    public String doModifyValidatorEnabling( HttpServletRequest request )
+    {
+        String strValidatorId = request.getParameter( PARAMETER_VALIDATOR_ID );
+        boolean bEnable = Boolean.valueOf( request.getParameter( PARAMETER_ENABLE ) );
+
+        if ( StringUtils.isNotEmpty( strValidatorId ) )
+        {
+            ShoppingCartValidatorManagementService.getInstance( ).changeValidatorEnabling( strValidatorId, bEnable );
+        }
+        return redirectView( request, VIEW_MANAGE_SHOPPING_CART );
     }
 }

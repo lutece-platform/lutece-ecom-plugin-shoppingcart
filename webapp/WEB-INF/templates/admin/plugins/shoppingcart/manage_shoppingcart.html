@@ -1,0 +1,46 @@
+<table class="table">
+	<tr>
+		<th>
+			#i18n{shoppingcart.manage_shoppingcart.labelValidator}
+		</th>
+		<th>
+			#i18n{shoppingcart.manage_shoppingcart.labelOrder}
+		</th>
+		<th>
+			#i18n{shoppingcart.manage_shoppingcart.labelEnable}
+		</th>
+	</tr>
+	<#list validators as validator>
+		<tr>
+			<td>
+				${validator.validatorDescription}
+			</td>
+			<td>
+				<form class="form-inline" action="jsp/admin/plugins/shoppingcart/ManageShoppingCart.jsp" method="post">
+					<input type="hidden" name="action" value="doModifyValidatorOrder">
+					<input type="hidden" name="validatorId" value="${validator.validatorId}">
+					<select name="newOrder" class="input-mini">
+						<#list 1..validators?size as i>
+							<#assign index = validator_index + 1>
+							<option name="${i}" <#if i == index>selected="selected"</#if>>${i}</option>
+						</#list>
+					</select>
+					<button class="btn btn-small btn-primary" type="submit" title="#i18n{portal.util.labelModify}">
+						<i class="icon-ok icon-white">&nbsp;</i>&nbsp;<span class="hidden-phone">#i18n{portal.util.labelModify}</span>
+					</button>
+				</form>
+			</td>
+			<td>
+				<#if validator.enabled>
+					<a class="btn btn-small btn-danger" title="#i18n{shoppingcart.manage_shoppingcart.labelDisable}" href="jsp/admin/plugins/shoppingcart/ManageShoppingCart.jsp?action=doModifyValidatorEnabling&validatorId=${validator.validatorId}&enable=false">
+						<i class="icon-remove-sign icon-white">&nbsp;</i>
+					</a>
+				<#else>
+					<a class="btn btn-small btn-success" title="#i18n{shoppingcart.manage_shoppingcart.labelEnable}" href="jsp/admin/plugins/shoppingcart/ManageShoppingCart.jsp?action=doModifyValidatorEnabling&validatorId=${validator.validatorId}&enable=true">
+						<i class="icon-ok-sign icon-white">&nbsp;</i>
+					</a>
+				</#if>
+			</td>
+		</tr>
+	</#list>
+</table>

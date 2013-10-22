@@ -38,6 +38,7 @@ import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItem;
 import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItemDTO;
 import fr.paris.lutece.plugins.shoppingcart.service.ShoppingCartService;
 import fr.paris.lutece.plugins.shoppingcart.service.provider.ShoppingCartItemProviderManagementService;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.message.SiteMessageService;
@@ -53,6 +54,7 @@ import fr.paris.lutece.util.url.UrlItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,9 +66,19 @@ import org.apache.commons.lang.StringUtils;
  * This class provides a simple implementation of an XPage
  */
 
-@Controller( xpageName = "shoppingcart", pageTitleProperty = "shoppingcart.myshoppingCart.pageTitle", pagePathProperty = "shoppingcart.myshoppingCart.pagePathLabel" )
+@Controller( xpageName = "shoppingcart", pageTitleProperty = ShoppingCartApp.DEFAULT_PAGE_TITLE, pagePathProperty = ShoppingCartApp.DEFAULT_PAGE_PATH_LABEL )
 public class ShoppingCartApp extends MVCApplication
 {
+    /**
+     * Default page title
+     */
+    public static final String DEFAULT_PAGE_TITLE = "shoppingcart.myshoppingCart.pageTitle";
+
+    /**
+     * Default page path label
+     */
+    public static final String DEFAULT_PAGE_PATH_LABEL = "shoppingcart.myshoppingCart.pagePathLabel";
+
     private static final String TEMPLATE_MY_SHOPPING_CART = "/skin/plugins/shoppingcart/my_shoppingcart.html";
     private static final String VIEW_MY_SHOPPING_CART = "myShoppingCart";
 
@@ -92,7 +104,7 @@ public class ShoppingCartApp extends MVCApplication
     {
         //        ShoppingCartItem newItem = new ShoppingCartItem( );
         //        newItem.setIdLot( 1 );
-        //        newItem.setIdResource( "3" );
+        //        newItem.setIdResource( "4" );
         //        newItem.setIdProvider( "dummyProviderService" );
         //        newItem.setResourceType( "resource type" );
         //        newItem.setItemPrice( 0d );
@@ -120,7 +132,8 @@ public class ShoppingCartApp extends MVCApplication
         Map<String, Object> model = new HashMap<String, Object>( );
         model.put( MARK_LIST_ITEMS, listDto );
         model.put( MARK_HAS_PRICE, bHasPrice );
-        return getXPage( TEMPLATE_MY_SHOPPING_CART, request.getLocale( ), model );
+        XPage xpage = getXPage( TEMPLATE_MY_SHOPPING_CART, request.getLocale( ), model );
+        return xpage;
     }
 
     /**
@@ -164,5 +177,19 @@ public class ShoppingCartApp extends MVCApplication
                     true );
         }
         return redirectView( request, VIEW_MY_SHOPPING_CART );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected XPage getXPage( String strTemplate, Locale locale, Map<String, Object> model )
+    {
+        XPage page = super.getXPage( strTemplate, locale, model );
+
+        page.setTitle( I18nService.getLocalizedString( DEFAULT_PAGE_TITLE, locale ) );
+        page.setPathLabel( I18nService.getLocalizedString( DEFAULT_PAGE_PATH_LABEL, locale ) );
+
+        return page;
     }
 }

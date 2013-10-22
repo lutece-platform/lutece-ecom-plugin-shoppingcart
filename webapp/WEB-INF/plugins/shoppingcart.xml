@@ -17,7 +17,7 @@
     <!-- Admin features parameters -->
     <admin-features>
         <admin-feature>
-            <feature-id>SHOPPINGCART_VALIDATORS_MANAGEMENT</feature-id>
+            <feature-id>SHOPPINGCART_MANAGEMENT</feature-id>
             <feature-title>shoppingcart.adminFeature.ManageShoppingCart.name</feature-title>
             <feature-description>shoppingcart.adminFeature.ManageShoppingCart.description</feature-description>
             <feature-level>0</feature-level>
