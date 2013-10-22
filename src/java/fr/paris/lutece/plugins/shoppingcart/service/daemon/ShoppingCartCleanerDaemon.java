@@ -19,9 +19,15 @@ import org.apache.commons.lang.StringUtils;
  */
 public class ShoppingCartCleanerDaemon extends Daemon
 {
+    /**
+     * Datastore key of the parameter that contains the number of days to wait
+     * before removing shopping cart items saved in the database
+     */
     public static final String DATASTORE_KEY_NB_DAYS_BEFORE_CLEANING = "shoppingcart.nbDaysBeforeCleaning";
 
     private static final String MESSAGE_ITEMS_HAVE_INFINITE_LIFE_TIME = "No item to remove : items have an infinite life time";
+    private static final String MESSAGE_NO_EXPIRED_ITEM_TO_REMOVE = "No expired item to remove";
+    private static final String MESSAGE_ITEMS_HAS_BEEN_REMOVED = " expired items have been removed";
 
     private static final String CONSTANT_ZERO = "0";
 
@@ -52,6 +58,11 @@ public class ShoppingCartCleanerDaemon extends Daemon
                         ShoppingCartService.getInstance( ).removeShoppingCartItem( item.getIdUser( ),
                                 item.getIdItem( ), true );
                     }
+                    setLastRunLogs( listItemsToRemove.size( ) + MESSAGE_ITEMS_HAS_BEEN_REMOVED );
+                }
+                else
+                {
+                    setLastRunLogs( MESSAGE_NO_EXPIRED_ITEM_TO_REMOVE );
                 }
             }
             else
