@@ -6,6 +6,7 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.ReferenceList;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,7 +20,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Service to manage shopping cart validators
  */
-public class ShoppingCartValidatorManagementService
+public final class ShoppingCartValidatorManagementService
 {
     private static final String DATASTORE_KEY_SHOPPING_CART_VALIDATOR_ORDER = "shoppingcart.validator.order.";
     private static final String DATASTORE_KEY_SHOPPING_CART_VALIDATOR_ENABLE = "shoppingcart.validator.enable.";
@@ -239,8 +240,12 @@ public class ShoppingCartValidatorManagementService
     /**
      * Comparator of validators. This class is used to sort them by their order
      */
-    private static class ValidatorComparator implements Comparator<IShoppingCartValidator>
+    private static class ValidatorComparator implements Comparator<IShoppingCartValidator>, Serializable
     {
+        /**
+         * Serial version UID
+         */
+        private static final long serialVersionUID = -913644993042601207L;
         private Map<String, Integer> _mapOrder;
 
         /**
