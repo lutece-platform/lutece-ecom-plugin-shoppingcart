@@ -1,0 +1,24 @@
+<div class="row-fluid">
+	<div class="span12">
+		<form class="form-horizontal" action="jsp/site/Portal.jsp?page=shoppingcart" method="post">
+			<fieldset>
+				<legend>#i18n{shoppingcart.validate_shoppingcart.pageTitle}</legend>
+			
+				<input type="hidden" name="action" value="doValidateShoppingCart">
+				<input type="hidden" name="key" value="${key}">
+				<input type="hidden" name="validatorId" value="${validatorId}">
+				
+				${validator_content!}
+				
+				<div class="form-actions">
+					<button name="validate" class="btn btn-small btn-primary" value="validate">
+						<i class="icon-ok icon-white">&nbsp;</i>&nbsp;#i18n{portal.util.labelValidate}
+					</button>
+					<button name="cancel" class="btn btn-small btn-danger" value="cancel">
+						<i class="icon-remove-circle icon-white">&nbsp;</i>&nbsp;#i18n{portal.util.labelCancel}
+					</button>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</div>

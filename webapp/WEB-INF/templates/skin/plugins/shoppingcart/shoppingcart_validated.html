@@ -1,0 +1,37 @@
+<div class="row-fluid">
+	<div class="span12">
+		
+		<br />
+		<p>#i18n{shoppingcart.shoppingcart_validated.labelShoppingCartValidated}</p>
+		<br />
+		<table class="table table-striped">
+			<tr>
+				<th>
+					#i18n{shoppingcart.myshoppintCart.labelColumnDescription}
+				</th>
+				<#if has_price?? && has_price>
+					<th>
+						#i18n{shoppingcart.myshoppintCart.labelColumnPrice}
+					</th>
+				</#if>
+			</tr>
+			<#list list_items as item>
+				<tr>
+					<td>
+						${item.description}
+					</td>
+					<#if has_price?? && has_price>
+						<td>
+							${item.itemPrice} €
+						</td>
+					</#if>
+				</tr>
+			</#list>
+		</table>
+		<div class="form-actions">
+			<a class="btn btn-small btn-primary" href="${url_back}">
+				#i18n{portal.util.labelBack}
+			</a>
+		</div>
+	</div>
+</div>

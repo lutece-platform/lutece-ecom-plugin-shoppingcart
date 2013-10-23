@@ -35,8 +35,10 @@ package fr.paris.lutece.plugins.shoppingcart.web;
 
 import fr.paris.lutece.plugins.shoppingcart.service.daemon.ShoppingCartCleanerDaemon;
 import fr.paris.lutece.plugins.shoppingcart.service.validator.IShoppingCartValidator;
-import fr.paris.lutece.plugins.shoppingcart.service.validator.ShoppingCartValidatorManagementService;
+import fr.paris.lutece.plugins.shoppingcart.service.validator.ShoppingCartValidatorService;
 import fr.paris.lutece.portal.service.datastore.DatastoreService;
+import fr.paris.lutece.portal.service.message.AdminMessage;
+import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
@@ -69,15 +71,21 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
     private static final String VIEW_MANAGE_SHOPPING_CART = "manageShoppingCart";
     private static final String ACTION_DO_MODIFY_VALIDATOR_ORDER = "doModifyValidatorOrder";
     private static final String ACTION_DO_MODIFY_VALIDATOR_ENABLING = "doModifyValidatorEnabling";
+    private static final String ACTION_DO_MODIFY_SHOPPING_CART_PARAMETERS = "doModifyShoppingCartParameters";
 
     private static final String PROPERTY_PAGE_TITLE_MANAGE_SHOPPINGCART = "shoppingcart.manage_shoppingcart.pageTitle";
 
+    private static final String MESSAGE_ITEMS_LIFE_TIME_NOT_INTEGER = "shoppingcart.manage_shoppingcart.error.itemsLifeTimeNotInteger";
+
     private static final String MARK_NB_DAYS_BEFORE_CLEANING = "nbDaysBeforeCleaning";
     private static final String MARK_VALIDATORS = "validators";
+    private static final String MARK_LIFE_TIME = "lifeTime";
+    private static final String MARK_BACK_URL = "back_url";
 
     private static final String PARAMETER_VALIDATOR_ID = "validatorId";
     private static final String PARAMETER_NEW_ORDER = "newOrder";
     private static final String PARAMETER_ENABLE = "enable";
+    private static final String PARAMETER_LIFE_TIME = "lifeTime";
 
     // Templates
     private static final String TEMPLATE_MANAGE_SHOPPINGCART = "admin/plugins/shoppingcart/manage_shoppingcart.html";
@@ -90,16 +98,20 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
     @View( value = VIEW_MANAGE_SHOPPING_CART, defaultView = true )
     public String getManageShoppingCart( HttpServletRequest request )
     {
-
         String strNbDaysBeforeCleaning = DatastoreService.getInstanceDataValue(
-                ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_DAYS_BEFORE_CLEANING, "" );
-        List<IShoppingCartValidator> listValidators = ShoppingCartValidatorManagementService.getInstance( )
-                .getValidatorlist( );
+                ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_HOURS_BEFORE_CLEANING, "" );
+        List<IShoppingCartValidator> listValidators = ShoppingCartValidatorService.getInstance( ).getValidatorlist( );
+
+        String strLifeTime = DatastoreService.getDataValue(
+                ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_HOURS_BEFORE_CLEANING, StringUtils.EMPTY );
 
         Map<String, Object> model = new HashMap<String, Object>( );
 
         model.put( MARK_NB_DAYS_BEFORE_CLEANING, strNbDaysBeforeCleaning );
         model.put( MARK_VALIDATORS, listValidators );
+        model.put( MARK_LIFE_TIME, strLifeTime );
+        model.put( MARK_BACK_URL,
+                DatastoreService.getDataValue( ShoppingCartApp.DATASTORE_KEY_URL_BACK, StringUtils.EMPTY ) );
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_SHOPPINGCART, TEMPLATE_MANAGE_SHOPPINGCART, model );
     }
 
@@ -118,7 +130,7 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
                 && StringUtils.isNumeric( strOrder ) )
         {
             int nNewOrder = Integer.parseInt( strOrder );
-            ShoppingCartValidatorManagementService.getInstance( ).modifyValidatorOrder( strValidatorId, nNewOrder );
+            ShoppingCartValidatorService.getInstance( ).modifyValidatorOrder( strValidatorId, nNewOrder );
         }
 
         return redirectView( request, VIEW_MANAGE_SHOPPING_CART );
@@ -137,8 +149,35 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
 
         if ( StringUtils.isNotEmpty( strValidatorId ) )
         {
-            ShoppingCartValidatorManagementService.getInstance( ).changeValidatorEnabling( strValidatorId, bEnable );
+            ShoppingCartValidatorService.getInstance( ).changeValidatorEnabling( strValidatorId, bEnable );
         }
+        return redirectView( request, VIEW_MANAGE_SHOPPING_CART );
+    }
+
+    /**
+     * Do modify the life time of shopping cart items saved in the database
+     * @param request The request
+     * @return The next URL to redirect to
+     */
+    @Action( ACTION_DO_MODIFY_SHOPPING_CART_PARAMETERS )
+    public String doModifyShoppingCartParameters( HttpServletRequest request )
+    {
+        String strLifeTime = request.getParameter( PARAMETER_LIFE_TIME );
+
+        if ( !StringUtils.isNumeric( strLifeTime ) )
+        {
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_ITEMS_LIFE_TIME_NOT_INTEGER,
+                    AdminMessage.TYPE_STOP ) );
+        }
+        if ( StringUtils.isEmpty( strLifeTime ) )
+        {
+            strLifeTime = Integer.toString( 0 );
+        }
+        DatastoreService.setDataValue( ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_HOURS_BEFORE_CLEANING, strLifeTime );
+
+        String strUrlBack = request.getParameter( MARK_BACK_URL );
+        DatastoreService.setDataValue( ShoppingCartApp.DATASTORE_KEY_URL_BACK, strUrlBack );
+
         return redirectView( request, VIEW_MANAGE_SHOPPING_CART );
     }
 }

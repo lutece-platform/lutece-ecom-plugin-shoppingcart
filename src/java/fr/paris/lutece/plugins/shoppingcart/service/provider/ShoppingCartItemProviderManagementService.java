@@ -40,6 +40,24 @@ public final class ShoppingCartItemProviderManagementService
     }
 
     /**
+     * Notify the provider of the item that the item has been successfully
+     * validated.
+     * @param item The validated item
+     */
+    public static void notifyItemValidation( ShoppingCartItem item )
+    {
+        for ( IShoppingCartItemProviderService providerService : SpringContextService
+                .getBeansOfType( IShoppingCartItemProviderService.class ) )
+        {
+            if ( StringUtils.equals( item.getIdProvider( ), providerService.getProviderId( ) ) )
+            {
+                providerService.notifyItemValidation( item.getResourceType( ), item.getIdResource( ) );
+                return;
+            }
+        }
+    }
+
+    /**
      * Get the description of a resource of the shopping cart
      * @param strProvider The provider of the resource
      * @param strResourceType The type of the resource

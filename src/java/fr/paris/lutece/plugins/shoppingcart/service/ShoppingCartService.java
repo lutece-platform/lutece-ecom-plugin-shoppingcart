@@ -138,6 +138,19 @@ public final class ShoppingCartService
     }
 
     /**
+     * Remove every items of the shopping of a user
+     * @param strUserName The name of the user to empty the shopping cart of, or
+     *            null if the user has not logged in.
+     * @param bNotifyProviderService True to notify the provider service of
+     *            every item removed, false otherwise
+     */
+    public void emptyShoppingCartOfUser( String strUserName, boolean bNotifyProviderService )
+    {
+        IShoppingCartPersistenceService persistenceService = getPersistenceService( isUserAnonymous( strUserName ) );
+        persistenceService.emptyShoppingCartOfUser( strUserName, bNotifyProviderService );
+    }
+
+    /**
      * Check if the current user has items in his anonymous shopping cart
      * @param strUserName The name of the user to check the shopping cart of
      */

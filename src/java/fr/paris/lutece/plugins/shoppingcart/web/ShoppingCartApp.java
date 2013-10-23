@@ -38,6 +38,9 @@ import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItem;
 import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItemDTO;
 import fr.paris.lutece.plugins.shoppingcart.service.ShoppingCartService;
 import fr.paris.lutece.plugins.shoppingcart.service.provider.ShoppingCartItemProviderManagementService;
+import fr.paris.lutece.plugins.shoppingcart.service.validator.IShoppingCartValidator;
+import fr.paris.lutece.plugins.shoppingcart.service.validator.ShoppingCartValidatorService;
+import fr.paris.lutece.portal.service.datastore.DatastoreService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
@@ -79,18 +82,39 @@ public class ShoppingCartApp extends MVCApplication
      */
     public static final String DEFAULT_PAGE_PATH_LABEL = "shoppingcart.myshoppingCart.pagePathLabel";
 
-    private static final String TEMPLATE_MY_SHOPPING_CART = "/skin/plugins/shoppingcart/my_shoppingcart.html";
-    private static final String VIEW_MY_SHOPPING_CART = "myShoppingCart";
+    public static final String DATASTORE_KEY_URL_BACK = "shoppingcart.urlBackAfterValidation";
 
-    private static final String ACTION_CONFIRM_REMOVE_ITEM = "confirmRemoveItem";
+    private static final String TEMPLATE_MY_SHOPPING_CART = "/skin/plugins/shoppingcart/my_shoppingcart.html";
+    private static final String TEMPLATE_VALIDATE_MY_SHOPPING_CART = "/skin/plugins/shoppingcart/validate_shoppingcart.html";
+    private static final String TEMPLATE_MY_SHOPPING_CART_VALIDATED = "/skin/plugins/shoppingcart/shoppingcart_validated.html";
+
+    private static final String VIEW_MY_SHOPPING_CART = "myShoppingCart";
+    private static final String VIEW_VALIDATE_SHOPPING_CART = "validateShoppingCart";
+    private static final String VIEW_CONFIRM_REMOVE_ITEM = "confirmRemoveItem";
+    private static final String VIEW_CONFIRM_EMPTY_SHOPPING_CART = "confirmEmptyShoppingCart";
+
     private static final String ACTION_REMOVE_ITEM = "removeItem";
+    private static final String ACTION_EMPTY_SHOPPING_CART = "emptyShoppingCart";
+    private static final String ACTION_DO_VALIDATE_SHOPPING_CART = "doValidateShoppingCart";
 
     private static final String MESSAGE_CONFIRM_REMOVE_ITEM = "shoppingcart.myshoppingCart.confirmRemoveItem";
+    private static final String MESSAGE_CONFIRM_EMPTY_SHOPPING_CART = "shoppingcart.myshoppingCart.confirmEmptyShoppingCart";
+
+    private static final String MESSAGE_VALIDATE_SHOPPING_CART_PAGE_TITLE = "shoppingcart.validate_shoppingcart.pageTitle";
+    private static final String MESSAGE_VALIDATE_SHOPPING_CART_PAGE_PATH_LABEL = "shoppingcart.validate_shoppingcart.pagePathLabel";
+    private static final String MESSAGE_SHOPPING_CART_VALIDATED_PAGE_TITLE = "shoppingcart.shoppingcart_validated.pageTitle";
+    private static final String MESSAGE_SHOPPING_CART_VALIDATED_PAGE_PATH_LABEL = "shoppingcart.shoppingcart_validated.pagePathLabel";
+    private static final String MESSAGE_SHOPPING_CART_MODIFIED = "shoppingcart.validate_shoppingcart.error.shoppingCartModified";
 
     private static final String PARAMETER_ID_ITEM = "idItem";
+    private static final String PARAMETER_VALIDATOR_ID = "validatorId";
+    private static final String PARAMETER_KEY = "key";
+    private static final String PARAMETER_CANCEL = "cancel";
 
     private static final String MARK_LIST_ITEMS = "list_items";
     private static final String MARK_HAS_PRICE = "has_price";
+    private static final String MARK_VALIDATOR_CONTENT = "validator_content";
+    private static final String MARK_URL_BACK = "url_back";
 
     private static final String PATH_PORTAL = "jsp/site/";
 
@@ -100,11 +124,11 @@ public class ShoppingCartApp extends MVCApplication
      * @return The view
      */
     @View( value = VIEW_MY_SHOPPING_CART, defaultView = true )
-    public XPage viewHome( HttpServletRequest request )
+    public XPage getViewMyShoppingCart( HttpServletRequest request )
     {
         //        ShoppingCartItem newItem = new ShoppingCartItem( );
         //        newItem.setIdLot( 1 );
-        //        newItem.setIdResource( "4" );
+        //        newItem.setIdResource( "104" );
         //        newItem.setIdProvider( "dummyProviderService" );
         //        newItem.setResourceType( "resource type" );
         //        newItem.setItemPrice( 0d );
@@ -143,7 +167,7 @@ public class ShoppingCartApp extends MVCApplication
      * @return An XPage
      * @throws SiteMessageException The message to display
      */
-    @Action( ACTION_CONFIRM_REMOVE_ITEM )
+    @View( VIEW_CONFIRM_REMOVE_ITEM )
     public XPage getConfirmRemoveItem( HttpServletRequest request ) throws SiteMessageException
     {
         String strIdItem = request.getParameter( PARAMETER_ID_ITEM );
@@ -157,7 +181,7 @@ public class ShoppingCartApp extends MVCApplication
         SiteMessageService.setMessage( request, MESSAGE_CONFIRM_REMOVE_ITEM, SiteMessage.TYPE_CONFIRMATION,
                 url.getUrl( ) );
 
-        return new XPage( );
+        return null;
     }
 
     /**
@@ -166,7 +190,7 @@ public class ShoppingCartApp extends MVCApplication
      * @return An XPage
      */
     @Action( ACTION_REMOVE_ITEM )
-    public XPage removeItem( HttpServletRequest request )
+    public XPage doRemoveItem( HttpServletRequest request )
     {
         String strIdItem = request.getParameter( PARAMETER_ID_ITEM );
         if ( StringUtils.isNotEmpty( strIdItem ) && StringUtils.isNumeric( strIdItem ) )
@@ -180,16 +204,222 @@ public class ShoppingCartApp extends MVCApplication
     }
 
     /**
+     * Get the confirmation message before removing every items of a shopping
+     * cart
+     * @param request The request
+     * @return An empty XPage
+     * @throws SiteMessageException A site message exception to display a site
+     *             message
+     */
+    @View( VIEW_CONFIRM_EMPTY_SHOPPING_CART )
+    public XPage getConfirmEmptyShoppingCart( HttpServletRequest request ) throws SiteMessageException
+    {
+        SiteMessageService.setMessage( request, MESSAGE_CONFIRM_EMPTY_SHOPPING_CART, SiteMessage.TYPE_CONFIRMATION,
+                PATH_PORTAL + getActionUrl( ACTION_EMPTY_SHOPPING_CART ) );
+        return null;
+    }
+
+    /**
+     * Do empty the shopping cart of the current user
+     * @param request The request
+     * @return The XPage to display
+     */
+    @Action( ACTION_EMPTY_SHOPPING_CART )
+    public XPage doEmptyShoppingCart( HttpServletRequest request )
+    {
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
+        ShoppingCartService.getInstance( ).emptyShoppingCartOfUser( user != null ? user.getName( ) : null, true );
+        return redirectView( request, VIEW_MY_SHOPPING_CART );
+    }
+
+    /**
+     * Get the validation form of the next validator for the shopping cart of
+     * the user. If the next validator has no form, then validates it and
+     * display the form of the next one. If there is no more validator to
+     * perform, display the validation success page
+     * @param request The request
+     * @return The XPage to display
+     * @throws SiteMessageException If a site message needs to be displayed
+     */
+    @View( VIEW_VALIDATE_SHOPPING_CART )
+    public XPage getValidateShoppingCart( HttpServletRequest request ) throws SiteMessageException
+    {
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
+        List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getShoppingCartOfUser( user );
+
+        if ( listItems == null || listItems.size( ) == 0 )
+        {
+            return redirectView( request, VIEW_MY_SHOPPING_CART );
+        }
+
+        String strValidatorId = request.getParameter( PARAMETER_VALIDATOR_ID );
+
+        if ( StringUtils.isNotEmpty( strValidatorId ) )
+        {
+            IShoppingCartValidator oldValidator = ShoppingCartValidatorService.getInstance( ).getValidator(
+                    strValidatorId );
+
+            String strOldGeneratedKey = oldValidator.getSecurityKeyForItems( listItems );
+            if ( strValidatorId != null )
+            {
+                String strProvidedKey = request.getParameter( PARAMETER_KEY );
+                // If the provided key is not correct, we redirect the user to the shopping cart management page
+                if ( !StringUtils.equals( strProvidedKey, strOldGeneratedKey ) )
+                {
+                    SiteMessageService.setMessage( request, MESSAGE_SHOPPING_CART_MODIFIED, SiteMessage.TYPE_STOP,
+                            getViewFullUrl( VIEW_MY_SHOPPING_CART ) );
+                }
+            }
+        }
+
+        IShoppingCartValidator validator = ShoppingCartValidatorService.getInstance( )
+                .getNextValidator( strValidatorId );
+        while ( validator != null && !validator.hasValidationForm( ) )
+        {
+            validateItemList( validator, listItems, request );
+            validator = ShoppingCartValidatorService.getInstance( ).getNextValidator( strValidatorId );
+        }
+
+        if ( validator == null )
+        {
+            // If there is no more validations to perform
+            boolean bHasPrice = false;
+            List<ShoppingCartItemDTO> listDto = new ArrayList<ShoppingCartItemDTO>( listItems.size( ) );
+            for ( ShoppingCartItem item : listItems )
+            {
+                ShoppingCartItemDTO itemDTO = new ShoppingCartItemDTO( item );
+                itemDTO.setDescription( ShoppingCartItemProviderManagementService.getItemDescription(
+                        item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
+                itemDTO.setModificationUrl( ShoppingCartItemProviderManagementService.getItemModificationUrl(
+                        item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
+                listDto.add( itemDTO );
+                if ( itemDTO.getItemPrice( ) > 0d )
+                {
+                    bHasPrice = true;
+                }
+
+                ShoppingCartItemProviderManagementService.notifyItemValidation( item );
+                // We now remove the item from the database without notifying the provider of the removal
+                ShoppingCartService.getInstance( ).removeShoppingCartItem( item.getIdUser( ), item.getIdItem( ), false );
+            }
+
+            String strUrlBack = DatastoreService.getInstanceDataValue( DATASTORE_KEY_URL_BACK,
+                    getViewFullUrl( VIEW_MY_SHOPPING_CART ) );
+
+            Map<String, Object> model = new HashMap<String, Object>( );
+            model.put( MARK_LIST_ITEMS, listDto );
+            model.put( MARK_HAS_PRICE, bHasPrice );
+            model.put( MARK_URL_BACK, strUrlBack );
+
+            return getXPage( TEMPLATE_MY_SHOPPING_CART_VALIDATED, request.getLocale( ), model,
+                    MESSAGE_SHOPPING_CART_VALIDATED_PAGE_TITLE, MESSAGE_SHOPPING_CART_VALIDATED_PAGE_PATH_LABEL );
+        }
+
+        String strGeneratedKey = validator.getSecurityKeyForItems( listItems );
+
+        Map<String, Object> model = new HashMap<String, Object>( );
+        model.put( PARAMETER_KEY, strGeneratedKey );
+        model.put( PARAMETER_VALIDATOR_ID, validator.getValidatorId( ) );
+        model.put( MARK_VALIDATOR_CONTENT, validator.getValidationFormHtml( listItems, request.getLocale( ) ) );
+        //        model.put( MARK_VALIDATORS_CONTENT, strValidatorsContent );
+        return getXPage( TEMPLATE_VALIDATE_MY_SHOPPING_CART, request.getLocale( ), model,
+                MESSAGE_VALIDATE_SHOPPING_CART_PAGE_TITLE, MESSAGE_VALIDATE_SHOPPING_CART_PAGE_PATH_LABEL );
+    }
+
+    /**
+     * Do validate a shopping cart with a validator specified in a request
+     * parameter
+     * @param request The request
+     * @return the XPage to display
+     * @throws SiteMessageException If an error occurs during the validation
+     */
+    @Action( ACTION_DO_VALIDATE_SHOPPING_CART )
+    public XPage doValidateShoppingCart( HttpServletRequest request ) throws SiteMessageException
+    {
+        if ( StringUtils.isNotEmpty( request.getParameter( PARAMETER_CANCEL ) ) )
+        {
+            return redirectView( request, VIEW_MY_SHOPPING_CART );
+        }
+
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
+        List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getShoppingCartOfUser( user );
+
+        if ( listItems == null || listItems.size( ) == 0 )
+        {
+            return redirectView( request, VIEW_MY_SHOPPING_CART );
+        }
+
+        String strValidatorId = request.getParameter( PARAMETER_VALIDATOR_ID );
+        String strProvidedKey = request.getParameter( PARAMETER_KEY );
+
+        IShoppingCartValidator validator = ShoppingCartValidatorService.getInstance( ).getValidator( strValidatorId );
+
+        String strGeneratedKey = validator.getSecurityKeyForItems( listItems );
+
+        // We check that the key is still good, ie we check that items to validate have not changed since the first step of the validation
+        if ( !StringUtils.equals( strProvidedKey, strGeneratedKey ) )
+        {
+            SiteMessageService.setMessage( request, MESSAGE_SHOPPING_CART_MODIFIED, SiteMessage.TYPE_STOP,
+                    getViewFullUrl( VIEW_MY_SHOPPING_CART ) );
+        }
+
+        validateItemList( validator, listItems, request );
+
+        // If the validation succeeded, we redirect the user to the next validator form
+        UrlItem url = new UrlItem( getViewUrl( VIEW_VALIDATE_SHOPPING_CART ) );
+        // We provide the id of the last succeeded validator
+        url.addParameter( PARAMETER_VALIDATOR_ID, strValidatorId );
+        // We authenticate the URL
+        url.addParameter( PARAMETER_KEY, strGeneratedKey );
+
+        return redirect( request, url.getUrl( ) );
+    }
+
+    /**
+     * Returns a new XPage object with the content filled by a template using a
+     * given model and for a given locale
+     * @param strTemplate The template to display
+     * @param locale The locale to use
+     * @param model The model containing parameters of the template
+     * @param strPageTitleProperty The i18n property of the title of the page
+     * @param strPagePathLabelProperty The i18n property of the page path label
+     * @return The XPage
+     * @see #getXPage(String, Locale, Map)
+     */
+    protected XPage getXPage( String strTemplate, Locale locale, Map<String, Object> model,
+            String strPageTitleProperty, String strPagePathLabelProperty )
+    {
+        XPage page = super.getXPage( strTemplate, locale, model );
+        page.setTitle( I18nService.getLocalizedString( strPageTitleProperty, locale ) );
+        page.setPathLabel( I18nService.getLocalizedString( strPagePathLabelProperty, locale ) );
+        return page;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     protected XPage getXPage( String strTemplate, Locale locale, Map<String, Object> model )
     {
-        XPage page = super.getXPage( strTemplate, locale, model );
+        return getXPage( strTemplate, locale, model, DEFAULT_PAGE_TITLE, DEFAULT_PAGE_PATH_LABEL );
+    }
 
-        page.setTitle( I18nService.getLocalizedString( DEFAULT_PAGE_TITLE, locale ) );
-        page.setPathLabel( I18nService.getLocalizedString( DEFAULT_PAGE_PATH_LABEL, locale ) );
-
-        return page;
+    /**
+     * Validate a list of items
+     * @param validator The validator to use
+     * @param listItems The list of items to validate
+     * @param request The request
+     * @throws SiteMessageException Throw a {@link SiteMessageException} if an
+     *             error occurs during the validation
+     */
+    private void validateItemList( IShoppingCartValidator validator, List<ShoppingCartItem> listItems,
+            HttpServletRequest request ) throws SiteMessageException
+    {
+        String strErrorKey = validator.validateShoppingCart( listItems, request.getParameterMap( ) );
+        if ( strErrorKey != null )
+        {
+            SiteMessageService.setMessage( request, strErrorKey, SiteMessage.TYPE_STOP,
+                    getViewFullUrl( VIEW_MY_SHOPPING_CART ) );
+        }
     }
 }

@@ -14,6 +14,13 @@ public interface IShoppingCartItemProviderService
     void notifyItemRemoval( String strResourceType, String strResourceId );
 
     /**
+     * Notify the provider that the resource has been successfully validated
+     * @param strResourceType The type of the validated resource
+     * @param strResourceId The id of the validated resource
+     */
+    void notifyItemValidation( String strResourceType, String strResourceId );
+
+    /**
      * Get the unique identifier of this provider service
      * @return The unique identifier of this provider service
      */

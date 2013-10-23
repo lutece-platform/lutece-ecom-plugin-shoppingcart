@@ -277,7 +277,7 @@ public class SessionPersistenceService implements IShoppingCartPersistenceServic
             sessionedItem = new SessionedShoppingCartItem( null, true );
             saveSessionedShoppingCartItem( sessionedItem );
         }
-        return sessionedItem.getItemList( );
+        return new ArrayList<ShoppingCartItem>( sessionedItem.getItemList( ) );
     }
 
     /**

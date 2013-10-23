@@ -20,18 +20,18 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Service to manage shopping cart validators
  */
-public final class ShoppingCartValidatorManagementService
+public final class ShoppingCartValidatorService
 {
     private static final String DATASTORE_KEY_SHOPPING_CART_VALIDATOR_ORDER = "shoppingcart.validator.order.";
     private static final String DATASTORE_KEY_SHOPPING_CART_VALIDATOR_ENABLE = "shoppingcart.validator.enable.";
 
-    private static ShoppingCartValidatorManagementService _instance = new ShoppingCartValidatorManagementService( );
+    private static ShoppingCartValidatorService _instance = new ShoppingCartValidatorService( );
     private volatile List<IShoppingCartValidator> _listValidators;
 
     /**
      * Default constructor
      */
-    private ShoppingCartValidatorManagementService( )
+    private ShoppingCartValidatorService( )
     {
         // Default constructor
     }
@@ -40,7 +40,7 @@ public final class ShoppingCartValidatorManagementService
      * Get the instance of the service
      * @return The instance of the service
      */
-    public static ShoppingCartValidatorManagementService getInstance( )
+    public static ShoppingCartValidatorService getInstance( )
     {
         return _instance;
     }
@@ -139,6 +139,85 @@ public final class ShoppingCartValidatorManagementService
         }
         generateValidatorList( );
     }
+
+    /**
+     * Get the next validator to use
+     * @param strLastValidatorId The last validator used or null if no
+     *            validators was applied yet. The next validator will be
+     *            returned, if any
+     * @return The next validator to apply, or null if there is no more
+     *         validator
+     */
+    public IShoppingCartValidator getNextValidator( String strLastValidatorId )
+    {
+        List<IShoppingCartValidator> listValidators = getValidatorlist( );
+        if ( listValidators.size( ) <= 0 )
+        {
+            return null;
+        }
+        if ( strLastValidatorId == null )
+        {
+            return listValidators.get( 0 );
+        }
+        boolean bFound = false;
+        for ( IShoppingCartValidator validator : getValidatorlist( ) )
+        {
+            if ( StringUtils.equals( validator.getValidatorId( ), strLastValidatorId ) )
+            {
+                bFound = true;
+            }
+            else
+            {
+                if ( bFound && validator.getEnabled( ) )
+                {
+                    return validator;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get a validator from its id
+     * @param strValidatorId The of the validator to get
+     * @return The validatorn, or null if no validator xas found
+     */
+    public IShoppingCartValidator getValidator( String strValidatorId )
+    {
+        for ( IShoppingCartValidator validator : getValidatorlist( ) )
+        {
+            if ( StringUtils.equals( validator.getValidatorId( ), strValidatorId ) )
+            {
+                return validator;
+            }
+        }
+        return null;
+    }
+
+    //    /**
+    //     * Validates a list of shopping cart items with a given validator
+    //     * @param listItems The list of items to validates
+    //     * @param mapRequestParameters The HTTP parameters
+    //     * @param strValidatorId The id of the validator to use
+    //     * @return The I18n key of the error message, or null if items were
+    //     *         successfully validated
+    //     */
+    //    public String doValidateShoppingCart( List<ShoppingCartItem> listItems, Map<String, String> mapRequestParameters,
+    //            String strValidatorId )
+    //    {
+    //        for ( IShoppingCartValidator validator : getValidatorlist( ) )
+    //        {
+    //            if ( StringUtils.equals( validator.getValidatorId( ), strValidatorId ) )
+    //            {
+    //                String strError = validator.validateShoppingCart( listItems, mapRequestParameters );
+    //                if ( StringUtils.isNotEmpty( strError ) )
+    //                {
+    //                    return strError;
+    //                }
+    //            }
+    //        }
+    //        return null;
+    //    }
 
     /**
      * Generate the list of validators sorted by their order. Disabled
