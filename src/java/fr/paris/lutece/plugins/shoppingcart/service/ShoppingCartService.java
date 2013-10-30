@@ -3,6 +3,7 @@ package fr.paris.lutece.plugins.shoppingcart.service;
 import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItem;
 import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItemFilter;
 import fr.paris.lutece.plugins.shoppingcart.service.persistence.IShoppingCartPersistenceService;
+import fr.paris.lutece.portal.service.datastore.DatastoreService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
@@ -16,6 +17,12 @@ import org.apache.commons.lang.StringUtils;
  */
 public final class ShoppingCartService
 {
+    /**
+     * Datastore key for the boolean value that indicates whether shopping cart
+     * items of registered users must be saved in the database
+     */
+    public static final String DATASTORE_KEY_ENABLE_DATABASE_PERSISTENCE = "shoppingcart.enableDatabasePersistence";
+
     private static final String BEAN_NAME_DATABASE_PERSISTENCE_SERVICE = "shoppingcart.databasePersistenceService";
     private static final String BEAN_NAME_SESSION_PERSISTENCE_SERVICE = "shoppingcart.sessionPersistenceService";
 
@@ -203,13 +210,14 @@ public final class ShoppingCartService
     /**
      * Get the persistence service for the current user
      * @param bForAnonymousUser True to get the service for anonymous users,
-     *            false
-     *            otherwise
+     *            false otherwise
      * @return The persistence service
      */
     private IShoppingCartPersistenceService getPersistenceService( boolean bForAnonymousUser )
     {
-        String strKey = bForAnonymousUser ? CACHE_KEY_ANONYMOUS_PERSISTENCE_SERVICE
+        boolean bDatabasePersistenceEnable = Boolean.parseBoolean( DatastoreService.getInstanceDataValue(
+                DATASTORE_KEY_ENABLE_DATABASE_PERSISTENCE, null ) );
+        String strKey = bForAnonymousUser || !bDatabasePersistenceEnable ? CACHE_KEY_ANONYMOUS_PERSISTENCE_SERVICE
                 : CACHE_KEY_LOGGED_IN_USERS_PERSISTENCE_SERVICE;
 
         IShoppingCartPersistenceService persistenceService = (IShoppingCartPersistenceService) ShoppingCartCacheService
@@ -217,7 +225,7 @@ public final class ShoppingCartService
         if ( persistenceService == null )
         {
             persistenceService = SpringContextService
-                    .getBean( bForAnonymousUser ? BEAN_NAME_SESSION_PERSISTENCE_SERVICE
+                    .getBean( bForAnonymousUser || !bDatabasePersistenceEnable ? BEAN_NAME_SESSION_PERSISTENCE_SERVICE
                             : BEAN_NAME_DATABASE_PERSISTENCE_SERVICE );
             ShoppingCartCacheService.getInstance( ).putInCache( strKey, persistenceService );
         }

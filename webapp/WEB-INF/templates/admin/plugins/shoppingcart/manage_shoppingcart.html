@@ -2,9 +2,17 @@
 <div class="row-fluid">
 	<div class="span3 well">
 		<form class="form-inline" action="jsp/admin/plugins/shoppingcart/ManageShoppingCart.jsp?page=shoppingcart&action=doModifyShoppingCartParameters" method="post">
-			<label>#i18n{shoppingcart.manage_shoppingcart.labelTimeToLive}</label>
-			<input type="text" class="input-mini" name="lifeTime" value="${lifeTime}" >
-			<span class="help-block">#i18n{shoppingcart.manage_shoppingcart.labelTimeToLiveHelp}</span>
+			<label class="checkbox">
+				<input type="checkbox" value="true" onclick="javascript:$('#itemsttl').toggle()" id="enable_database_persistence" name="enable_database_persistence" <#if enable_database_persistence?? && enable_database_persistence>checked="checked"</#if> >
+				#i18n{shoppingcart.manage_shoppingcart.labelEnableDatabasePersistence}
+			</label>
+			<span class="help-block">#i18n{shoppingcart.manage_shoppingcart.labelEnableDatabasePersistenceHelp}</span>
+			
+			<div id="itemsttl">
+				<label>#i18n{shoppingcart.manage_shoppingcart.labelTimeToLive}</label>
+				<input type="text" class="input-mini" name="lifeTime" value="${lifeTime}" >
+				<span class="help-block">#i18n{shoppingcart.manage_shoppingcart.labelTimeToLiveHelp}</span>
+			</div>
 			
 			<label>#i18n{shoppingcart.manage_shoppingcart.labelBackUrl}</label>
 			<input type="text" name="back_url" class="span" value="${back_url}">
@@ -70,3 +78,12 @@
 		</table>
 	</div>
 </div>
+<script>
+    $(document).ready( function () {
+    	
+    	if ( !$("#enable_database_persistence").attr("checked") )
+    	{
+        	$("#itemsttl").toggle();
+    	}
+    });
+</script>

@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.shoppingcart.web;
 
+import fr.paris.lutece.plugins.shoppingcart.service.ShoppingCartService;
 import fr.paris.lutece.plugins.shoppingcart.service.daemon.ShoppingCartCleanerDaemon;
 import fr.paris.lutece.plugins.shoppingcart.service.validator.IShoppingCartValidator;
 import fr.paris.lutece.plugins.shoppingcart.service.validator.ShoppingCartValidatorService;
@@ -83,6 +84,7 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
     private static final String MARK_LIFE_TIME = "lifeTime";
     private static final String MARK_BACK_URL = "back_url";
     private static final String MARK_LOCALE = "locale";
+    private static final String MARK_ENABLE_DATABASE_PERSISTENCE = "enable_database_persistence";
 
     private static final String PARAMETER_VALIDATOR_ID = "validatorId";
     private static final String PARAMETER_NEW_ORDER = "newOrder";
@@ -115,6 +117,8 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
         model.put( MARK_BACK_URL,
                 DatastoreService.getDataValue( ShoppingCartApp.DATASTORE_KEY_URL_BACK, StringUtils.EMPTY ) );
         model.put( MARK_LOCALE, AdminUserService.getLocale( request ) );
+        model.put( MARK_ENABLE_DATABASE_PERSISTENCE, Boolean.parseBoolean( DatastoreService.getDataValue(
+                ShoppingCartService.DATASTORE_KEY_ENABLE_DATABASE_PERSISTENCE, null ) ) );
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_SHOPPINGCART, TEMPLATE_MANAGE_SHOPPINGCART, model );
     }
 
@@ -180,6 +184,10 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
 
         String strUrlBack = request.getParameter( MARK_BACK_URL );
         DatastoreService.setDataValue( ShoppingCartApp.DATASTORE_KEY_URL_BACK, strUrlBack );
+
+        String strEnableDatabasePersistence = request.getParameter( MARK_ENABLE_DATABASE_PERSISTENCE );
+        DatastoreService.setDataValue( ShoppingCartService.DATASTORE_KEY_ENABLE_DATABASE_PERSISTENCE,
+                strEnableDatabasePersistence );
 
         return redirectView( request, VIEW_MANAGE_SHOPPING_CART );
     }
