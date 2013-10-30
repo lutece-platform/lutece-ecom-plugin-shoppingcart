@@ -7,7 +7,7 @@
 			<span class="help-block">#i18n{shoppingcart.manage_shoppingcart.labelTimeToLiveHelp}</span>
 			
 			<label>#i18n{shoppingcart.manage_shoppingcart.labelBackUrl}</label>
-			<input type="text" name="back_url" value="${back_url}">
+			<input type="text" name="back_url" class="span" value="${back_url}">
 			<span class="help-block">#i18n{shoppingcart.manage_shoppingcart.labelBackUrlHelp}</span>
 			
 			<div class="form-actions">
@@ -16,6 +16,10 @@
 				</button>
 			</div>
 		</form>
+	</div>
+	<div class="span9 alert alert-info">
+		<a class="close" data-dismiss="alert" href="http://localhost:8080/lutece/jsp/admin/plugins/shoppingcart/ManageShoppingCart.jsp?plugin_name=shoppingcart#">x</a>
+		<i class="icon-info-sign">&nbsp;</i>&nbsp;#i18n{shoppingcart.manage_shoppingcart.labelValidatorHelp}
 	</div>
 	<div class="span9">
 		<table class="table">
@@ -33,7 +37,7 @@
 			<#list validators as validator>
 				<tr>
 					<td>
-						${validator.validatorDescription}
+						${validator.getValidatorDescription( locale )}
 					</td>
 					<td>
 						<form class="form-inline" action="jsp/admin/plugins/shoppingcart/ManageShoppingCart.jsp" method="post">

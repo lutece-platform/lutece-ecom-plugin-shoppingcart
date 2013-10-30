@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.shoppingcart.web;
 
 import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItem;
 import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItemDTO;
+import fr.paris.lutece.plugins.shoppingcart.service.ShoppingCartLotService;
 import fr.paris.lutece.plugins.shoppingcart.service.ShoppingCartService;
 import fr.paris.lutece.plugins.shoppingcart.service.provider.ShoppingCartItemProviderManagementService;
 import fr.paris.lutece.plugins.shoppingcart.service.validator.IShoppingCartValidator;
@@ -126,22 +127,32 @@ public class ShoppingCartApp extends MVCApplication
     @View( value = VIEW_MY_SHOPPING_CART, defaultView = true )
     public XPage getViewMyShoppingCart( HttpServletRequest request )
     {
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
         //        ShoppingCartItem newItem = new ShoppingCartItem( );
         //        newItem.setIdLot( 1 );
+        //        newItem.setIdLot( ShoppingCartLotService.getInstance( ).getLastIdlotOfUser( user ) );
         //        newItem.setIdResource( "104" );
         //        newItem.setIdProvider( "dummyProviderService" );
         //        newItem.setResourceType( "resource type" );
         //        newItem.setItemPrice( 0d );
         //        ShoppingCartService.getInstance( ).addItemToShoppingCart( newItem );
 
-        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
         List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getShoppingCartOfUser( user );
 
         List<ShoppingCartItemDTO> listDto = new ArrayList<ShoppingCartItemDTO>( listItems.size( ) );
         boolean bHasPrice = false;
+        int nIdLot = 0;
         for ( ShoppingCartItem item : listItems )
         {
             ShoppingCartItemDTO itemDTO = new ShoppingCartItemDTO( item );
+            if ( itemDTO.getIdLot( ) == ShoppingCartItem.NEW_ID_LOT_FOR_ANONYMOUS_USER )
+            {
+                itemDTO.setIdLot( ++nIdLot );
+            }
+            else if ( itemDTO.getIdLot( ) == ShoppingCartItem.LAST_ID_LOT_FOR_ANONYMOUS_USER )
+            {
+                itemDTO.setIdLot( nIdLot );
+            }
             itemDTO.setDescription( ShoppingCartItemProviderManagementService.getItemDescription(
                     item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
             itemDTO.setModificationUrl( ShoppingCartItemProviderManagementService.getItemModificationUrl(
@@ -276,7 +287,7 @@ public class ShoppingCartApp extends MVCApplication
                 .getNextValidator( strValidatorId );
         while ( validator != null && !validator.hasValidationForm( ) )
         {
-            validateItemList( validator, listItems, request );
+            validateItemList( user, validator, listItems, request );
             validator = ShoppingCartValidatorService.getInstance( ).getNextValidator( strValidatorId );
         }
 
@@ -285,8 +296,22 @@ public class ShoppingCartApp extends MVCApplication
             // If there is no more validations to perform
             boolean bHasPrice = false;
             List<ShoppingCartItemDTO> listDto = new ArrayList<ShoppingCartItemDTO>( listItems.size( ) );
+            int nLastIdLot = 1;
+            String strUserName = user != null && user.getName( ) != null ? user.getName( )
+                    : LuteceUser.ANONYMOUS_USERNAME;
             for ( ShoppingCartItem item : listItems )
             {
+                // We check that the user has
+                if ( item.getIdLot( ) == ShoppingCartItem.NEW_ID_LOT_FOR_ANONYMOUS_USER )
+                {
+                    nLastIdLot = ShoppingCartLotService.getInstance( ).getNewIdLotForUser( strUserName );
+                    item.setIdLot( nLastIdLot );
+                }
+                else if ( item.getIdLot( ) == ShoppingCartItem.LAST_ID_LOT_FOR_ANONYMOUS_USER )
+                {
+                    item.setIdLot( nLastIdLot );
+                }
+
                 ShoppingCartItemDTO itemDTO = new ShoppingCartItemDTO( item );
                 itemDTO.setDescription( ShoppingCartItemProviderManagementService.getItemDescription(
                         item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
@@ -363,7 +388,7 @@ public class ShoppingCartApp extends MVCApplication
                     getViewFullUrl( VIEW_MY_SHOPPING_CART ) );
         }
 
-        validateItemList( validator, listItems, request );
+        validateItemList( user, validator, listItems, request );
 
         // If the validation succeeded, we redirect the user to the next validator form
         UrlItem url = new UrlItem( getViewUrl( VIEW_VALIDATE_SHOPPING_CART ) );
@@ -412,10 +437,10 @@ public class ShoppingCartApp extends MVCApplication
      * @throws SiteMessageException Throw a {@link SiteMessageException} if an
      *             error occurs during the validation
      */
-    private void validateItemList( IShoppingCartValidator validator, List<ShoppingCartItem> listItems,
+    private void validateItemList( LuteceUser user, IShoppingCartValidator validator, List<ShoppingCartItem> listItems,
             HttpServletRequest request ) throws SiteMessageException
     {
-        String strErrorKey = validator.validateShoppingCart( listItems, request.getParameterMap( ) );
+        String strErrorKey = validator.validateShoppingCart( user, listItems, request.getParameterMap( ) );
         if ( strErrorKey != null )
         {
             SiteMessageService.setMessage( request, strErrorKey, SiteMessage.TYPE_STOP,

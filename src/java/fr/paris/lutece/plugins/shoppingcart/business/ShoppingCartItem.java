@@ -43,6 +43,15 @@ import java.util.Date;
 public class ShoppingCartItem implements Serializable
 {
     /**
+     * New id lot of an anonymous user
+     */
+    public static final int NEW_ID_LOT_FOR_ANONYMOUS_USER = -10;
+    /**
+     * Last id of lot of user for an anonymous user
+     */
+    public static final int LAST_ID_LOT_FOR_ANONYMOUS_USER = -1;
+
+    /**
      * Serial version UID
      */
     private static final long serialVersionUID = 8367766101486301893L;

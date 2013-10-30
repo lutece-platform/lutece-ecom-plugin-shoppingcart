@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-    <bean id="shoppingcart.shoppingCartItemDAO"  class="fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItemDAO" />  
-
+    <bean id="shoppingcart.shoppingCartItemDAO" class="fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItemDAO" />  
+	<bean id="shoppingcart.shoppingCartLoDAO" class="fr.paris.lutece.plugins.shoppingcart.business.lot.ShoppingCartLotDAO" />
     <bean id="shoppingcart.ShoppingCartPortletDAO"  class="fr.paris.lutece.plugins.shoppingcart.business.portlet.ShoppingCartPortletDAO" />
     
     <bean id="shoppingcart.sessionPersistenceService" class="fr.paris.lutece.plugins.shoppingcart.service.persistence.SessionPersistenceService" />
     <bean id="shoppingcart.databasePersistenceService" class="fr.paris.lutece.plugins.shoppingcart.service.persistence.DatabasePersistenceService" />
+    
+    <bean id="shoppingcart.loggedInUserValidator" class="fr.paris.lutece.plugins.shoppingcart.service.validator.LoggedInUserValidator" />
+    	
 </beans>

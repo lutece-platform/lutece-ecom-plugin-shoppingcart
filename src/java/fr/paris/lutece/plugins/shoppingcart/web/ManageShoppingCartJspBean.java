@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.shoppingcart.web;
 import fr.paris.lutece.plugins.shoppingcart.service.daemon.ShoppingCartCleanerDaemon;
 import fr.paris.lutece.plugins.shoppingcart.service.validator.IShoppingCartValidator;
 import fr.paris.lutece.plugins.shoppingcart.service.validator.ShoppingCartValidatorService;
+import fr.paris.lutece.portal.service.admin.AdminUserService;
 import fr.paris.lutece.portal.service.datastore.DatastoreService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -81,6 +82,7 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
     private static final String MARK_VALIDATORS = "validators";
     private static final String MARK_LIFE_TIME = "lifeTime";
     private static final String MARK_BACK_URL = "back_url";
+    private static final String MARK_LOCALE = "locale";
 
     private static final String PARAMETER_VALIDATOR_ID = "validatorId";
     private static final String PARAMETER_NEW_ORDER = "newOrder";
@@ -112,6 +114,7 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
         model.put( MARK_LIFE_TIME, strLifeTime );
         model.put( MARK_BACK_URL,
                 DatastoreService.getDataValue( ShoppingCartApp.DATASTORE_KEY_URL_BACK, StringUtils.EMPTY ) );
+        model.put( MARK_LOCALE, AdminUserService.getLocale( request ) );
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_SHOPPINGCART, TEMPLATE_MANAGE_SHOPPINGCART, model );
     }
 

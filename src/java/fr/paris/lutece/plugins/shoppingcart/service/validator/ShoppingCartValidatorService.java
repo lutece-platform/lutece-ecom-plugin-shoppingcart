@@ -157,12 +157,20 @@ public final class ShoppingCartValidatorService
         }
         if ( strLastValidatorId == null )
         {
-            return listValidators.get( 0 );
+            for ( IShoppingCartValidator validator : getValidatorlist( ) )
+            {
+                if ( validator.getEnabled( ) )
+                {
+                    return validator;
+                }
+            }
+            return null;
         }
         boolean bFound = false;
         for ( IShoppingCartValidator validator : getValidatorlist( ) )
         {
-            if ( StringUtils.equals( validator.getValidatorId( ), strLastValidatorId ) )
+            // We check if this validator is the last validator applied
+            if ( !bFound && StringUtils.equals( validator.getValidatorId( ), strLastValidatorId ) )
             {
                 bFound = true;
             }

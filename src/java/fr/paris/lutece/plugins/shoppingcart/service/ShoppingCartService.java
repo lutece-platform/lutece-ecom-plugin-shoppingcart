@@ -61,6 +61,10 @@ public final class ShoppingCartService
      */
     public void addItemToShoppingCart( ShoppingCartItem item )
     {
+        if ( item.getIdLot( ) == 0 )
+        {
+            item.setIdLot( ShoppingCartLotService.getInstance( ).getNewIdLotForUser( item.getIdUser( ) ) );
+        }
         getPersistenceService( StringUtils.isEmpty( item.getIdUser( ) ) ).saveItem( item );
     }
 
@@ -166,9 +170,18 @@ public final class ShoppingCartService
             {
                 IShoppingCartPersistenceService loggedInUserPersistenceService = getPersistenceService( false );
                 // we add items of the anonymous service to the logged in service
+                ShoppingCartLotService instance = ShoppingCartLotService.getInstance( );
                 for ( ShoppingCartItem item : listItems )
                 {
                     item.setIdUser( strUserName );
+                    if ( item.getIdLot( ) == ShoppingCartItem.NEW_ID_LOT_FOR_ANONYMOUS_USER )
+                    {
+                        item.setIdLot( instance.getNewIdLotForUser( strUserName ) );
+                    }
+                    else if ( item.getIdLot( ) == ShoppingCartItem.LAST_ID_LOT_FOR_ANONYMOUS_USER )
+                    {
+                        item.setIdLot( instance.getLastIdlotOfUser( strUserName ) );
+                    }
                     loggedInUserPersistenceService.saveItem( item );
                 }
                 // Now that items are transfered, we empty the anonymous shopping cart

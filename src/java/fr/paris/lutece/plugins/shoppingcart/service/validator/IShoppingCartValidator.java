@@ -1,6 +1,7 @@
 package fr.paris.lutece.plugins.shoppingcart.service.validator;
 
 import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItem;
+import fr.paris.lutece.portal.service.security.LuteceUser;
 
 import java.util.List;
 import java.util.Locale;
@@ -22,10 +23,12 @@ public interface IShoppingCartValidator
      * Get a short description of the validator
      * @return The description of the validator
      */
-    String getValidatorDescription( );
+    String getValidatorDescription( Locale locale );
 
     /**
      * Validate items of the shopping cart of a user.
+     * @param user The user associated with the shopping cart. May be null if
+     *            the user has not logged in
      * @param listItemsToValidate The list of items to validate
      * @param mapRequestParameters The map containing request parameters if the
      *            validator needs to display a form, or null if the validator
@@ -33,7 +36,8 @@ public interface IShoppingCartValidator
      * @return Null if items are valid and contain no errors, or a i18n key of a
      *         message that describes the error if items could not be validated
      */
-    String validateShoppingCart( List<ShoppingCartItem> listItemsToValidate, Map<String, String[]> mapRequestParameters );
+    String validateShoppingCart( LuteceUser user, List<ShoppingCartItem> listItemsToValidate,
+            Map<String, String[]> mapRequestParameters );
 
     /**
      * Check if this validator needs to display a form before validating data
