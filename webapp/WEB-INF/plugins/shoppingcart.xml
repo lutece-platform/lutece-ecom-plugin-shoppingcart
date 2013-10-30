@@ -59,4 +59,12 @@
 			<url-pattern>/jsp/site/*</url-pattern>
 		</filter>
 	</filters>
+	<daemons>
+        <daemon>
+            <daemon-id>shoppingCartCleanerDaemon</daemon-id>
+            <daemon-name>shoppingcart.daemon.shoppingCartCleanerDaemon.name</daemon-name>
+            <daemon-description>shoppingcart.daemon.shoppingCartCleanerDaemon.description</daemon-description>
+            <daemon-class>fr.paris.lutece.plugins.shoppingcart.service.daemon.ShoppingCartCleanerDaemon</daemon-class>
+        </daemon>
+	</daemons>
 </plug-in>

@@ -65,8 +65,8 @@ public final class ShoppingCartItemDAO implements IShoppingCartItemDAO
     private static final String SQL_FILTER_RESOURCE_TYPE = " resource_type = ? ";
     private static final String SQL_FILTER_ITEM_PRICE = " item_price = ? ";
     private static final String SQL_FILTER_ID_LOT = " id_lot = ? ";
-    private static final String SQL_FILTER_DATE_CREATION_MIN = " date_creation < ? ";
-    private static final String SQL_FILTER_DATE_CREATION_MAX = " date_creation > ? ";
+    private static final String SQL_FILTER_DATE_CREATION_MIN = " date_creation > ? ";
+    private static final String SQL_FILTER_DATE_CREATION_MAX = " date_creation < ? ";
 
     private static final String CONSTANT_WHERE = " WHERE ";
     private static final String CONSTANT_AND = " AND ";
