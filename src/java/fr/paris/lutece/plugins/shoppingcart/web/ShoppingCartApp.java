@@ -130,13 +130,6 @@ public class ShoppingCartApp extends MVCApplication
     public XPage getViewMyShoppingCart( HttpServletRequest request )
     {
         LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
-        //        ShoppingCartItem newItem = new ShoppingCartItem( );
-        //        newItem.setIdLot( ShoppingCartLotService.getInstance( ).getLastIdlotOfUser( user ) );
-        //        newItem.setIdResource( "105" );
-        //        newItem.setIdProvider( "dummyProviderService" );
-        //        newItem.setResourceType( "resource type" );
-        //        newItem.setItemPrice( 0d );
-        //        ShoppingCartService.getInstance( ).addItemToShoppingCart( newItem );
 
         List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getShoppingCartOfUser( user );
 
