@@ -41,5 +41,5 @@ import fr.paris.lutece.portal.business.portlet.IPortletInterfaceDAO;
  */
 public interface IShoppingCartPortletDAO extends IPortletInterfaceDAO
 {
-
+    // No specific method yet
 }

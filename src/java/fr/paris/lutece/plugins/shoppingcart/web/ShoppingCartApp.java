@@ -111,11 +111,13 @@ public class ShoppingCartApp extends MVCApplication
     private static final String PARAMETER_VALIDATOR_ID = "validatorId";
     private static final String PARAMETER_KEY = "key";
     private static final String PARAMETER_CANCEL = "cancel";
+    private static final String PARAMETER_REFERER = "referer";
 
     private static final String MARK_LIST_ITEMS = "list_items";
     private static final String MARK_HAS_PRICE = "has_price";
     private static final String MARK_VALIDATOR_CONTENT = "validator_content";
     private static final String MARK_URL_BACK = "url_back";
+    private static final String MARK_REFERER = "shoppingcart.referer";
 
     private static final String PATH_PORTAL = "jsp/site/";
 
@@ -187,6 +189,11 @@ public class ShoppingCartApp extends MVCApplication
             return redirectView( request, VIEW_MY_SHOPPING_CART );
         }
 
+        // We save the referer in session to redirect the user to it
+        if ( StringUtils.isBlank( (String) request.getSession( ).getAttribute( MARK_REFERER ) ) )
+        {
+            request.getSession( ).setAttribute( MARK_REFERER, request.getHeader( PARAMETER_REFERER ) );
+        }
         UrlItem url = new UrlItem( PATH_PORTAL + getActionUrl( ACTION_REMOVE_ITEM ) );
         url.addParameter( PARAMETER_ID_ITEM, strIdItem );
         SiteMessageService.setMessage( request, MESSAGE_CONFIRM_REMOVE_ITEM, SiteMessage.TYPE_CONFIRMATION,
@@ -211,6 +218,13 @@ public class ShoppingCartApp extends MVCApplication
             ShoppingCartService.getInstance( ).removeShoppingCartItem( user == null ? null : user.getName( ), nIdItem,
                     true );
         }
+        String strReferer = (String) request.getSession( ).getAttribute( MARK_REFERER );
+        if ( StringUtils.isNotBlank( strReferer ) )
+        {
+            request.getSession( ).setAttribute( MARK_REFERER, null );
+            return redirect( request, strReferer );
+        }
+
         return redirectView( request, VIEW_MY_SHOPPING_CART );
     }
 
@@ -225,6 +239,11 @@ public class ShoppingCartApp extends MVCApplication
     @View( VIEW_CONFIRM_EMPTY_SHOPPING_CART )
     public XPage getConfirmEmptyShoppingCart( HttpServletRequest request ) throws SiteMessageException
     {
+        // We save the referer in session to redirect the user to it
+        if ( StringUtils.isBlank( (String) request.getSession( ).getAttribute( MARK_REFERER ) ) )
+        {
+            request.getSession( ).setAttribute( MARK_REFERER, request.getHeader( PARAMETER_REFERER ) );
+        }
         SiteMessageService.setMessage( request, MESSAGE_CONFIRM_EMPTY_SHOPPING_CART, SiteMessage.TYPE_CONFIRMATION,
                 PATH_PORTAL + getActionUrl( ACTION_EMPTY_SHOPPING_CART ) );
         return null;
@@ -240,6 +259,14 @@ public class ShoppingCartApp extends MVCApplication
     {
         LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
         ShoppingCartService.getInstance( ).emptyShoppingCartOfUser( user != null ? user.getName( ) : null, true );
+
+        String strReferer = (String) request.getSession( ).getAttribute( MARK_REFERER );
+        if ( StringUtils.isNotBlank( strReferer ) )
+        {
+            request.getSession( ).setAttribute( MARK_REFERER, null );
+            return redirect( request, strReferer );
+        }
+
         return redirectView( request, VIEW_MY_SHOPPING_CART );
     }
 
@@ -257,6 +284,12 @@ public class ShoppingCartApp extends MVCApplication
     {
         LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
         List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getShoppingCartOfUser( user );
+
+        // We save the referer in session to redirect the user to it
+        if ( StringUtils.isBlank( (String) request.getSession( ).getAttribute( MARK_REFERER ) ) )
+        {
+            request.getSession( ).setAttribute( MARK_REFERER, request.getHeader( PARAMETER_REFERER ) );
+        }
 
         if ( listItems == null || listItems.size( ) == 0 )
         {
@@ -288,7 +321,7 @@ public class ShoppingCartApp extends MVCApplication
         while ( validator != null && !validator.hasValidationForm( ) )
         {
             validateItemList( user, validator, listItems, request );
-            validator = ShoppingCartValidatorService.getInstance( ).getNextValidator( strValidatorId );
+            validator = ShoppingCartValidatorService.getInstance( ).getNextValidator( validator.getValidatorId( ) );
         }
 
         if ( validator == null )
@@ -331,6 +364,13 @@ public class ShoppingCartApp extends MVCApplication
             String strUrlBack = DatastoreService.getInstanceDataValue( DATASTORE_KEY_URL_BACK,
                     getViewFullUrl( VIEW_MY_SHOPPING_CART ) );
 
+            // If no return url is set, we redirect the user where he came from
+            if ( StringUtils.isEmpty( strUrlBack ) )
+            {
+                strUrlBack = (String) request.getSession( ).getAttribute( MARK_REFERER );
+                request.getSession( ).setAttribute( MARK_REFERER, null );
+            }
+
             Map<String, Object> model = new HashMap<String, Object>( );
             model.put( MARK_LIST_ITEMS, listDto );
             model.put( MARK_HAS_PRICE, bHasPrice );
@@ -363,6 +403,12 @@ public class ShoppingCartApp extends MVCApplication
     {
         if ( StringUtils.isNotEmpty( request.getParameter( PARAMETER_CANCEL ) ) )
         {
+            String strReferer = (String) request.getSession( ).getAttribute( MARK_REFERER );
+            if ( StringUtils.isNotBlank( strReferer ) )
+            {
+                request.getSession( ).setAttribute( MARK_REFERER, null );
+                return redirect( request, strReferer );
+            }
             return redirectView( request, VIEW_MY_SHOPPING_CART );
         }
 

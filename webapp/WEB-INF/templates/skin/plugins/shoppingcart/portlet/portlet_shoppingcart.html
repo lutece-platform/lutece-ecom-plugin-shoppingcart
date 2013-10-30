@@ -1,0 +1,62 @@
+<div class="row-fluid">
+	<div class="span12 well">
+		<fieldset>
+			<legend>#i18n{shoppingcart.myshoppingCart.pageTitle}</legend>
+			<#if list_items?size == 0>
+				#i18n{shoppingcart.myshoppingCart.noItem}
+			<#else>
+				<table class="table table-striped">
+					<tr>
+						<th>
+							#i18n{shoppingcart.myshoppintCart.labelLot}
+						</th>
+						<th>
+							#i18n{shoppingcart.myshoppintCart.labelColumnDescription}
+						</th>
+						<#if has_price?? && has_price>
+							<th>
+								#i18n{shoppingcart.myshoppintCart.labelColumnPrice}
+							</th>
+						</#if>
+						<th>
+							#i18n{shoppingcart.myshoppintCart.labelColumnActions}
+						</th>
+					</tr>
+					<#list list_items as item>
+						<tr>
+							<td>
+								${item.idLot}
+							</td>
+							<td>
+								${item.description}
+							</td>
+							<#if has_price?? && has_price>
+								<td>
+									${item.itemPrice} €
+								</td>
+							</#if>
+							<td>
+								<#if item.modificationUrl??>
+									<a class="btn btn-primary btn-small" href="${item.modificationUrl}" title="#i18n{portal.util.labelModify}">
+										<i class="icon-edit icon-white">&nbsp;</i>
+									</a>
+								</#if>
+								<a class="btn btn-danger btn-small" href="jsp/site/Portal.jsp?page=shoppingcart&view=confirmRemoveItem&idItem=${item.idItem}" title="#i18n{portal.util.labelDelete}">
+									<i class="icon-trash icon-white">&nbsp;</i>
+								</a>
+							</td>
+						</tr>
+					</#list>
+				</table>
+				<div class="form-actions">
+					<a href="jsp/site/Portal.jsp?page=shoppingcart&view=validateShoppingCart" class="btn btn-small btn-primary" title="#i18n{portal.util.labelValidate}">
+						<i class="icon-ok icon-white">&nbsp;</i>&nbsp;#i18n{portal.util.labelValidate}
+					</a>
+					<a href="jsp/site/Portal.jsp?page=shoppingcart&view=confirmEmptyShoppingCart" class="btn btn-small btn-danger" title="#i18n{shoppingcart.myshoppintCart.labelEmptyShoppingCart}">
+						<i class="icon-remove-circle icon-white">&nbsp;</i>&nbsp;#i18n{shoppingcart.myshoppintCart.labelEmptyShoppingCart}
+					</a>
+				</div>
+			</#if>
+		</fieldset>
+	</div>
+</div>
