@@ -21,6 +21,7 @@ public interface IShoppingCartValidator
 
     /**
      * Get a short description of the validator
+     * @param locale The locale
      * @return The description of the validator
      */
     String getValidatorDescription( Locale locale );

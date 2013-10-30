@@ -431,6 +431,7 @@ public class ShoppingCartApp extends MVCApplication
 
     /**
      * Validate a list of items
+     * @param user The user
      * @param validator The validator to use
      * @param listItems The list of items to validate
      * @param request The request
