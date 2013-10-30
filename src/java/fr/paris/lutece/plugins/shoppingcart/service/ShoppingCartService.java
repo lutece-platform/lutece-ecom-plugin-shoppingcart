@@ -168,7 +168,8 @@ public final class ShoppingCartService
     protected void checkAnonymousShoppingCart( String strUserName )
     {
         // If the user is not anonymous
-        if ( !isUserAnonymous( strUserName ) )
+        if ( Boolean.parseBoolean( DatastoreService.getInstanceDataValue( DATASTORE_KEY_ENABLE_DATABASE_PERSISTENCE,
+                null ) ) && !isUserAnonymous( strUserName ) )
         {
             IShoppingCartPersistenceService anonymousUserPersistenceService = getPersistenceService( true );
             List<ShoppingCartItem> listItems = anonymousUserPersistenceService.getItemsOfUser( strUserName );
