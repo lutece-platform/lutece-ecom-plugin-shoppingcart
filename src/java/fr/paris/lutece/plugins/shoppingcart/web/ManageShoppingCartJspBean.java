@@ -103,11 +103,11 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
     public String getManageShoppingCart( HttpServletRequest request )
     {
         String strNbDaysBeforeCleaning = DatastoreService.getInstanceDataValue(
-                ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_HOURS_BEFORE_CLEANING, "" );
+                ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_DAYS_BEFORE_CLEANING, "" );
         List<IShoppingCartValidator> listValidators = ShoppingCartValidatorService.getInstance( ).getValidatorlist( );
 
         String strLifeTime = DatastoreService.getDataValue(
-                ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_HOURS_BEFORE_CLEANING, StringUtils.EMPTY );
+                ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_DAYS_BEFORE_CLEANING, StringUtils.EMPTY );
 
         Map<String, Object> model = new HashMap<String, Object>( );
 
@@ -180,7 +180,7 @@ public class ManageShoppingCartJspBean extends MVCAdminJspBean
         {
             strLifeTime = Integer.toString( 0 );
         }
-        DatastoreService.setDataValue( ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_HOURS_BEFORE_CLEANING, strLifeTime );
+        DatastoreService.setDataValue( ShoppingCartCleanerDaemon.DATASTORE_KEY_NB_DAYS_BEFORE_CLEANING, strLifeTime );
 
         String strUrlBack = request.getParameter( MARK_BACK_URL );
         DatastoreService.setDataValue( ShoppingCartApp.DATASTORE_KEY_URL_BACK, strUrlBack );

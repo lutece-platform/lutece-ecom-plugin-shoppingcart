@@ -23,7 +23,7 @@ public class ShoppingCartCleanerDaemon extends Daemon
      * Datastore key of the parameter that contains the number of days to wait
      * before removing shopping cart items saved in the database
      */
-    public static final String DATASTORE_KEY_NB_HOURS_BEFORE_CLEANING = "shoppingcart.nbHoursBeforeCleaning";
+    public static final String DATASTORE_KEY_NB_DAYS_BEFORE_CLEANING = "shoppingcart.nbHoursBeforeCleaning";
 
     private static final String MESSAGE_ITEMS_HAVE_INFINITE_LIFE_TIME = "No item to remove : items have an infinite life time";
     private static final String MESSAGE_NO_EXPIRED_ITEM_TO_REMOVE = "No expired item to remove";
@@ -37,20 +37,20 @@ public class ShoppingCartCleanerDaemon extends Daemon
     @Override
     public void run( )
     {
-        String strNbHoursBeforeCleaning = DatastoreService.getInstanceDataValue( DATASTORE_KEY_NB_HOURS_BEFORE_CLEANING,
+        String strNbDaysBeforeCleaning = DatastoreService.getInstanceDataValue( DATASTORE_KEY_NB_DAYS_BEFORE_CLEANING,
                 CONSTANT_ZERO );
 
-        if ( StringUtils.isNumeric( strNbHoursBeforeCleaning ) )
+        if ( StringUtils.isNumeric( strNbDaysBeforeCleaning ) )
         {
             int nNbDayBeforeCleaning = 0;
-            if ( StringUtils.isNotEmpty( strNbHoursBeforeCleaning ) )
+            if ( StringUtils.isNotEmpty( strNbDaysBeforeCleaning ) )
             {
-                nNbDayBeforeCleaning = Integer.parseInt( strNbHoursBeforeCleaning );
+                nNbDayBeforeCleaning = Integer.parseInt( strNbDaysBeforeCleaning );
             }
             if ( nNbDayBeforeCleaning > 0 )
             {
                 Calendar calendar = GregorianCalendar.getInstance( );
-                calendar.add( GregorianCalendar.HOUR_OF_DAY, nNbDayBeforeCleaning * -1 );
+                calendar.add( GregorianCalendar.DAY_OF_MONTH, nNbDayBeforeCleaning * -1 );
                 ShoppingCartItemFilter filter = new ShoppingCartItemFilter( );
                 filter.setDateCreationMax( calendar.getTime( ) );
                 List<ShoppingCartItem> listItemsToRemove = ShoppingCartService.getInstance( )
@@ -77,7 +77,7 @@ public class ShoppingCartCleanerDaemon extends Daemon
         else
         {
             AppLogService.error( "Non-integer value for the number of days before items cleaning : "
-                    + strNbHoursBeforeCleaning );
+                    + strNbDaysBeforeCleaning );
             setLastRunLogs( MESSAGE_ITEMS_HAVE_INFINITE_LIFE_TIME );
         }
     }

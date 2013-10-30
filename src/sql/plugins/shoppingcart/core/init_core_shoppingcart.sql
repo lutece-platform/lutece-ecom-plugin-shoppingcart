@@ -13,5 +13,5 @@ INSERT INTO core_admin_right (id_right,name,level_right,admin_url,description,is
 INSERT INTO core_user_right (id_right,id_user) VALUES ('SHOPPINGCART_MANAGEMENT',1);
 
 INSERT INTO core_datastore (entity_key,entity_value) VALUES ('shoppingcart.enableDatabasePersistence', 'true');
-INSERT INTO core_datastore (entity_key,entity_value) VALUES ('shoppingcart.nbHoursBeforeCleaning', '48');
+INSERT INTO core_datastore (entity_key,entity_value) VALUES ('shoppingcart.nbDaysBeforeCleaning', '48');
 INSERT INTO core_datastore (entity_key,entity_value) VALUES ('shoppingcart.urlBackAfterValidation', 'jsp/site/Portal.jsp');

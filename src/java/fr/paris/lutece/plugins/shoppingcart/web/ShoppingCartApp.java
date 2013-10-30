@@ -131,9 +131,8 @@ public class ShoppingCartApp extends MVCApplication
     {
         LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
         //        ShoppingCartItem newItem = new ShoppingCartItem( );
-        //        newItem.setIdLot( 1 );
         //        newItem.setIdLot( ShoppingCartLotService.getInstance( ).getLastIdlotOfUser( user ) );
-        //        newItem.setIdResource( "104" );
+        //        newItem.setIdResource( "105" );
         //        newItem.setIdProvider( "dummyProviderService" );
         //        newItem.setResourceType( "resource type" );
         //        newItem.setItemPrice( 0d );
@@ -490,8 +489,16 @@ public class ShoppingCartApp extends MVCApplication
         String strErrorKey = validator.validateShoppingCart( user, listItems, request.getParameterMap( ) );
         if ( strErrorKey != null )
         {
-            SiteMessageService.setMessage( request, strErrorKey, SiteMessage.TYPE_STOP,
-                    getViewFullUrl( VIEW_MY_SHOPPING_CART ) );
+            String strRedirectUrl = (String) request.getSession( ).getAttribute( MARK_REFERER );
+            if ( StringUtils.isNotBlank( strRedirectUrl ) )
+            {
+                request.getSession( ).setAttribute( MARK_REFERER, null );
+            }
+            else
+            {
+                strRedirectUrl = getViewFullUrl( VIEW_MY_SHOPPING_CART );
+            }
+            SiteMessageService.setMessage( request, strErrorKey, SiteMessage.TYPE_STOP, strRedirectUrl );
         }
     }
 }

@@ -36,6 +36,9 @@ package fr.paris.lutece.plugins.shoppingcart.business;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
+
 
 /**
  * Business class of the shopping cart items
@@ -208,5 +211,45 @@ public class ShoppingCartItem implements Serializable
     public void setDateCreation( Date dateCreation )
     {
         this._dateCreation = dateCreation == null ? null : (Date) dateCreation.clone( );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals( Object o )
+    {
+        if ( o instanceof ShoppingCartItem )
+        {
+            ShoppingCartItem other = (ShoppingCartItem) o;
+            return getIdItem( ) == other.getIdItem( )
+                    && StringUtils.equals( getIdProvider( ), other.getIdProvider( ) )
+                    && getIdLot( ) == other.getIdLot( )
+                    && StringUtils.equals( getIdUser( ), other.getIdUser( ) )
+                    && StringUtils.equals( getResourceType( ), other.getResourceType( ) )
+                    && StringUtils.equals( getIdResource( ), other.getIdResource( ) )
+                    && getItemPrice( ) == other.getItemPrice( )
+                    && ( ( getDateCreation( ) == null && other.getDateCreation( ) == null ) || ( getDateCreation( ) != null
+                            && other.getDateCreation( ) != null && DateUtils.isSameDay( getDateCreation( ),
+                            other.getDateCreation( ) ) ) );
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode( )
+    {
+        int nHash = _nIdItem;
+        nHash = 30 * nHash + ( _strIdProvider == null ? 0 : _strIdProvider.hashCode( ) );
+        nHash = 30 * nHash + _nIdLot;
+        nHash = 30 * nHash + ( _strIdUser == null ? 0 : _strIdUser.hashCode( ) );
+        nHash = 30 * nHash + ( _strResourceType == null ? 0 : _strResourceType.hashCode( ) );
+        nHash = 30 * nHash + ( _strIdResource == null ? 0 : _strIdResource.hashCode( ) );
+        nHash = 30 * nHash + ( _dItemPrice > 0d ? Double.valueOf( _dItemPrice ).hashCode( ) : 0 );
+        nHash = 30 * nHash + ( _dateCreation == null ? 0 : _dateCreation.hashCode( ) );
+        return nHash;
     }
 }
