@@ -9,10 +9,18 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 /**
  * Home for shopping cart lot
  */
-public class ShoppingCartLotHome
+public final class ShoppingCartLotHome
 {
     private static IShoppingCartLotDAO _dao = SpringContextService.getBean( "shoppingcart.shoppingCartLoDAO" );
     private static Plugin _plugin = PluginService.getPlugin( ShoppingCartPlugin.PLUGIN_NAME );
+
+    /**
+     * Private constructor
+     */
+    private ShoppingCartLotHome( )
+    {
+        // Do nothing
+    }
 
     /**
      * Get the last id lot used by a user

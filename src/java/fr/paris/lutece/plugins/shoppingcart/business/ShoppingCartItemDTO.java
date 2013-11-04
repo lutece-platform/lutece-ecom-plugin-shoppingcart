@@ -94,4 +94,22 @@ public class ShoppingCartItemDTO extends ShoppingCartItem
     {
         this._strModificationUrl = strModificationUrl;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals( Object o )
+    {
+        return super.equals( o );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode( )
+    {
+        return super.hashCode( );
+    }
 }
