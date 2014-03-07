@@ -48,11 +48,13 @@ import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.message.SiteMessageService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
 import fr.paris.lutece.portal.web.xpages.XPage;
+import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
 
 import java.util.ArrayList;
@@ -69,7 +71,6 @@ import org.apache.commons.lang.StringUtils;
 /**
  * This class provides a simple implementation of an XPage
  */
-
 @Controller( xpageName = "shoppingcart", pageTitleProperty = ShoppingCartApp.DEFAULT_PAGE_TITLE, pagePathProperty = ShoppingCartApp.DEFAULT_PAGE_PATH_LABEL )
 public class ShoppingCartApp extends MVCApplication
 {
@@ -83,11 +84,18 @@ public class ShoppingCartApp extends MVCApplication
      */
     public static final String DEFAULT_PAGE_PATH_LABEL = "shoppingcart.myshoppingCart.pagePathLabel";
 
+    /**
+     * Datastore key of the URL to redirect the user to after the validation of
+     * its shopping cart
+     */
     public static final String DATASTORE_KEY_URL_BACK = "shoppingcart.urlBackAfterValidation";
+
+    private static final long serialVersionUID = 8047167849115970508L;
 
     private static final String TEMPLATE_MY_SHOPPING_CART = "/skin/plugins/shoppingcart/my_shoppingcart.html";
     private static final String TEMPLATE_VALIDATE_MY_SHOPPING_CART = "/skin/plugins/shoppingcart/validate_shoppingcart.html";
     private static final String TEMPLATE_MY_SHOPPING_CART_VALIDATED = "/skin/plugins/shoppingcart/shoppingcart_validated.html";
+    private static final String TEMPLATE_PORTELT_SHOPPING_CART = "/skin/plugins/shoppingcart/portlet/portlet_shoppingcart.html";
 
     private static final String VIEW_MY_SHOPPING_CART = "myShoppingCart";
     private static final String VIEW_VALIDATE_SHOPPING_CART = "validateShoppingCart";
@@ -129,39 +137,10 @@ public class ShoppingCartApp extends MVCApplication
     @View( value = VIEW_MY_SHOPPING_CART, defaultView = true )
     public XPage getViewMyShoppingCart( HttpServletRequest request )
     {
-        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
-
-        List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getShoppingCartOfUser( user );
-
-        List<ShoppingCartItemDTO> listDto = new ArrayList<ShoppingCartItemDTO>( listItems.size( ) );
-        boolean bHasPrice = false;
-        int nIdLot = 0;
-        for ( ShoppingCartItem item : listItems )
-        {
-            ShoppingCartItemDTO itemDTO = new ShoppingCartItemDTO( item );
-            if ( itemDTO.getIdLot( ) == ShoppingCartItem.NEW_ID_LOT_FOR_ANONYMOUS_USER )
-            {
-                itemDTO.setIdLot( ++nIdLot );
-            }
-            else if ( itemDTO.getIdLot( ) == ShoppingCartItem.LAST_ID_LOT_FOR_ANONYMOUS_USER )
-            {
-                itemDTO.setIdLot( nIdLot );
-            }
-            itemDTO.setDescription( ShoppingCartItemProviderManagementService.getItemDescription(
-                    item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
-            itemDTO.setModificationUrl( ShoppingCartItemProviderManagementService.getItemModificationUrl(
-                    item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
-            listDto.add( itemDTO );
-            if ( itemDTO.getItemPrice( ) > 0d )
-            {
-                bHasPrice = true;
-            }
-        }
-
-        Map<String, Object> model = new HashMap<String, Object>( );
-        model.put( MARK_LIST_ITEMS, listDto );
-        model.put( MARK_HAS_PRICE, bHasPrice );
-        XPage xpage = getXPage( TEMPLATE_MY_SHOPPING_CART, request.getLocale( ), model );
+        XPage xpage = new XPage( );
+        xpage.setContent( getHtmlViewMyShoppingCart( request, false ) );
+        xpage.setPathLabel( I18nService.getLocalizedString( DEFAULT_PAGE_PATH_LABEL, request.getLocale( ) ) );
+        xpage.setTitle( I18nService.getLocalizedString( DEFAULT_PAGE_TITLE, request.getLocale( ) ) );
         return xpage;
     }
 
@@ -213,7 +192,7 @@ public class ShoppingCartApp extends MVCApplication
         String strReferer = (String) request.getSession( ).getAttribute( MARK_REFERER );
         if ( StringUtils.isNotBlank( strReferer ) )
         {
-            request.getSession( ).setAttribute( MARK_REFERER, null );
+            request.getSession( ).removeAttribute( MARK_REFERER );
             return redirect( request, strReferer );
         }
 
@@ -255,7 +234,7 @@ public class ShoppingCartApp extends MVCApplication
         String strReferer = (String) request.getSession( ).getAttribute( MARK_REFERER );
         if ( StringUtils.isNotBlank( strReferer ) )
         {
-            request.getSession( ).setAttribute( MARK_REFERER, null );
+            request.getSession( ).removeAttribute( MARK_REFERER );
             return redirect( request, strReferer );
         }
 
@@ -360,7 +339,7 @@ public class ShoppingCartApp extends MVCApplication
             if ( StringUtils.isEmpty( strUrlBack ) )
             {
                 strUrlBack = (String) request.getSession( ).getAttribute( MARK_REFERER );
-                request.getSession( ).setAttribute( MARK_REFERER, null );
+                request.getSession( ).removeAttribute( MARK_REFERER );
             }
 
             Map<String, Object> model = new HashMap<String, Object>( );
@@ -398,7 +377,7 @@ public class ShoppingCartApp extends MVCApplication
             String strReferer = (String) request.getSession( ).getAttribute( MARK_REFERER );
             if ( StringUtils.isNotBlank( strReferer ) )
             {
-                request.getSession( ).setAttribute( MARK_REFERER, null );
+                request.getSession( ).removeAttribute( MARK_REFERER );
                 return redirect( request, strReferer );
             }
             return redirectView( request, VIEW_MY_SHOPPING_CART );
@@ -436,6 +415,55 @@ public class ShoppingCartApp extends MVCApplication
         url.addParameter( PARAMETER_KEY, strGeneratedKey );
 
         return redirect( request, url.getUrl( ) );
+    }
+
+    /**
+     * Get the HTML code to display the content of the shopping cart of a user
+     * @param request The request
+     * @param bUsePortletTemplate True to use the template of the my shopping
+     *            cart portlet, false to use the XPage template. If the HTML
+     *            will be displayed in another page, then the portlet template
+     *            should be used
+     * @return The HTML code to display
+     */
+    public static String getHtmlViewMyShoppingCart( HttpServletRequest request, boolean bUsePortletTemplate )
+    {
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
+
+        List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getShoppingCartOfUser( user );
+
+        List<ShoppingCartItemDTO> listDto = new ArrayList<ShoppingCartItemDTO>( listItems.size( ) );
+        boolean bHasPrice = false;
+        int nIdLot = 0;
+        for ( ShoppingCartItem item : listItems )
+        {
+            ShoppingCartItemDTO itemDTO = new ShoppingCartItemDTO( item );
+            if ( itemDTO.getIdLot( ) == ShoppingCartItem.NEW_ID_LOT_FOR_ANONYMOUS_USER )
+            {
+                itemDTO.setIdLot( ++nIdLot );
+            }
+            else if ( itemDTO.getIdLot( ) == ShoppingCartItem.LAST_ID_LOT_FOR_ANONYMOUS_USER )
+            {
+                itemDTO.setIdLot( nIdLot );
+            }
+            itemDTO.setDescription( ShoppingCartItemProviderManagementService.getItemDescription(
+                    item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
+            itemDTO.setModificationUrl( ShoppingCartItemProviderManagementService.getItemModificationUrl(
+                    item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
+            listDto.add( itemDTO );
+            if ( itemDTO.getItemPrice( ) > 0d )
+            {
+                bHasPrice = true;
+            }
+        }
+
+        Map<String, Object> model = new HashMap<String, Object>( );
+        model.put( MARK_LIST_ITEMS, listDto );
+        model.put( MARK_HAS_PRICE, bHasPrice );
+
+        HtmlTemplate template = AppTemplateService.getTemplate( bUsePortletTemplate ? TEMPLATE_PORTELT_SHOPPING_CART
+                : TEMPLATE_MY_SHOPPING_CART, request.getLocale( ), model );
+        return template.getHtml( );
     }
 
     /**
@@ -485,7 +513,7 @@ public class ShoppingCartApp extends MVCApplication
             String strRedirectUrl = (String) request.getSession( ).getAttribute( MARK_REFERER );
             if ( StringUtils.isNotBlank( strRedirectUrl ) )
             {
-                request.getSession( ).setAttribute( MARK_REFERER, null );
+                request.getSession( ).removeAttribute( MARK_REFERER );
             }
             else
             {

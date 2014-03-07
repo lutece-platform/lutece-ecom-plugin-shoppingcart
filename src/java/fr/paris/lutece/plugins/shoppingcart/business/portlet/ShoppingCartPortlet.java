@@ -33,20 +33,8 @@
  */
 package fr.paris.lutece.plugins.shoppingcart.business.portlet;
 
-import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItem;
-import fr.paris.lutece.plugins.shoppingcart.business.ShoppingCartItemDTO;
-import fr.paris.lutece.plugins.shoppingcart.service.ShoppingCartService;
-import fr.paris.lutece.plugins.shoppingcart.service.provider.ShoppingCartItemProviderManagementService;
+import fr.paris.lutece.plugins.shoppingcart.web.ShoppingCartApp;
 import fr.paris.lutece.portal.business.portlet.PortletHtmlContent;
-import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.security.SecurityService;
-import fr.paris.lutece.portal.service.template.AppTemplateService;
-import fr.paris.lutece.util.html.HtmlTemplate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -56,13 +44,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ShoppingCartPortlet extends PortletHtmlContent
 {
-    /////////////////////////////////////////////////////////////////////////////////
-    // Constants
-    private static final String TEMPLATE_PORTELT_SHOPPING_CART = "/skin/plugins/shoppingcart/portlet/portlet_shoppingcart.html";
-
-    private static final String MARK_LIST_ITEMS = "list_items";
-    private static final String MARK_HAS_PRICE = "has_price";
-
     /**
      * Sets the identifier of the portlet type to value specified
      */
@@ -72,7 +53,7 @@ public class ShoppingCartPortlet extends PortletHtmlContent
     }
 
     /**
-     * Returns the HTML code of the ShoppingCartPortlet portlet with XML heading
+     * Returns the HTML code of the ShoppingCartPortlet portlet
      * 
      * @param request The HTTP servlet request
      * @return the HTML code of the ShoppingCartPortlet portlet
@@ -80,42 +61,7 @@ public class ShoppingCartPortlet extends PortletHtmlContent
     @Override
     public String getHtmlContent( HttpServletRequest request )
     {
-        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
-
-        List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getShoppingCartOfUser( user );
-
-        List<ShoppingCartItemDTO> listDto = new ArrayList<ShoppingCartItemDTO>( listItems.size( ) );
-        boolean bHasPrice = false;
-        int nIdLot = 0;
-        for ( ShoppingCartItem item : listItems )
-        {
-            ShoppingCartItemDTO itemDTO = new ShoppingCartItemDTO( item );
-            if ( itemDTO.getIdLot( ) == ShoppingCartItem.NEW_ID_LOT_FOR_ANONYMOUS_USER )
-            {
-                itemDTO.setIdLot( ++nIdLot );
-            }
-            else if ( itemDTO.getIdLot( ) == ShoppingCartItem.LAST_ID_LOT_FOR_ANONYMOUS_USER )
-            {
-                itemDTO.setIdLot( nIdLot );
-            }
-            itemDTO.setDescription( ShoppingCartItemProviderManagementService.getItemDescription(
-                    item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
-            itemDTO.setModificationUrl( ShoppingCartItemProviderManagementService.getItemModificationUrl(
-                    item.getIdProvider( ), item.getResourceType( ), item.getIdResource( ) ) );
-            listDto.add( itemDTO );
-            if ( itemDTO.getItemPrice( ) > 0d )
-            {
-                bHasPrice = true;
-            }
-        }
-
-        Map<String, Object> model = new HashMap<String, Object>( );
-        model.put( MARK_LIST_ITEMS, listDto );
-        model.put( MARK_HAS_PRICE, bHasPrice );
-
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_PORTELT_SHOPPING_CART, request.getLocale( ),
-                model );
-        return template.getHtml( );
+        return ShoppingCartApp.getHtmlViewMyShoppingCart( request, true );
     }
 
     /**
