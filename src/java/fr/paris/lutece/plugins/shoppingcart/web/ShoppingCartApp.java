@@ -428,6 +428,22 @@ public class ShoppingCartApp extends MVCApplication
      */
     public static String getHtmlViewMyShoppingCart( HttpServletRequest request, boolean bUsePortletTemplate )
     {
+        return getHtmlViewMyShoppingCart( request, bUsePortletTemplate, null );
+    }
+
+    /**
+     * Get the HTML code to display the content of the shopping cart of a user
+     * @param request The request
+     * @param bUsePortletTemplate True to use the template of the my shopping
+     *            cart portlet, false to use the XPage template. If the HTML
+     *            will be displayed in another page, then the portlet template
+     *            should be used
+     * @param modelPrefilled prefilled model use before add own data
+     * @return The HTML code to display
+     */
+    public static String getHtmlViewMyShoppingCart( HttpServletRequest request, boolean bUsePortletTemplate,
+            Map<String, Object> modelPrefilled )
+    {
         LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
 
         List<ShoppingCartItem> listItems = ShoppingCartService.getInstance( ).getShoppingCartOfUser( user );
@@ -460,6 +476,12 @@ public class ShoppingCartApp extends MVCApplication
         Map<String, Object> model = new HashMap<String, Object>( );
         model.put( MARK_LIST_ITEMS, listDto );
         model.put( MARK_HAS_PRICE, bHasPrice );
+
+        //add all data given
+        if ( modelPrefilled != null && !modelPrefilled.isEmpty( ) )
+        {
+            model.putAll( modelPrefilled );
+        }
 
         HtmlTemplate template = AppTemplateService.getTemplate( bUsePortletTemplate ? TEMPLATE_PORTELT_SHOPPING_CART
                 : TEMPLATE_MY_SHOPPING_CART, request.getLocale( ), model );
