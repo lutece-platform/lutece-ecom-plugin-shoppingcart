@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<plug-in>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><plug-in>
     <name>shoppingcart</name>
     <class>fr.paris.lutece.plugins.shoppingcart.service.ShoppingCartPlugin</class>
     <version>1.0.0</version>
-    <documentation></documentation>
-    <installation></installation>
-    <changes></changes>
-    <user-guide></user-guide>
+    <documentation/>
+    <installation/>
+    <changes/>
+    <user-guide/>
     <description>shoppingcart.plugin.description</description>
     <provider>shoppingcart.plugin.provider</provider>
     <provider-url>http://dev.lutece.paris.fr</provider-url>
@@ -22,7 +21,7 @@
             <feature-description>shoppingcart.adminFeature.ManageShoppingCart.description</feature-description>
             <feature-level>0</feature-level>
             <feature-url>jsp/admin/plugins/shoppingcart/ManageShoppingCart.jsp</feature-url>
-            <feature-icon-url></feature-icon-url>
+            <feature-icon-url/>
       </admin-feature>
     </admin-features>    
   	<!-- XPages parameters -->
@@ -47,8 +46,8 @@
         <portlet-modify-script-template>/admin/portlet/script_modify_portlet.html</portlet-modify-script-template>
         <portlet-create-specific-template>/admin/plugins/shoppingcart/portlet/create_portletshoppingcart.html</portlet-create-specific-template>
         <portlet-modify-specific-template>/admin/plugins/shoppingcart/portlet/modify_portletshoppingcart.html</portlet-modify-specific-template>
-        <portlet-create-specific-form-template></portlet-create-specific-form-template>
-        <portlet-modify-specific-form-template></portlet-modify-specific-form-template> 
+        <portlet-create-specific-form-template/>
+        <portlet-modify-specific-form-template/> 
      </portlet>
    </portlets>
    
