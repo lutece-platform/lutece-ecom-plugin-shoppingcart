@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><plug-in>
     <name>shoppingcart</name>
     <class>fr.paris.lutece.plugins.shoppingcart.service.ShoppingCartPlugin</class>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <documentation/>
     <installation/>
     <changes/>
